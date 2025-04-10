@@ -67,3 +67,25 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.addEventListener('resize', generateTimelineLines);
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle search form submission
+    const searchForm = document.getElementById('searchForm');
+    searchForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const searchQuery = document.getElementById('searchInput').value;
+        window.location.href = `results.html?type=search&query=${encodeURIComponent(searchQuery)}`;
+    });
+
+    // Handle timeline track clicks
+    const timelineTrack = document.getElementById('timelineTrack');
+    timelineTrack.addEventListener('click', function(e) {
+        const clickedElement = e.target;
+        
+        // Check if clicked element is a timeline line
+        if (clickedElement.classList.contains('line')) {
+            const year = clickedElement.getAttribute('data-tooltip');
+            window.location.href = `results.html?type=timeline&year=${year}`;
+        }
+    });
+});

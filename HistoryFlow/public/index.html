@@ -28,7 +28,7 @@
         <div class="container mx-auto text-center">
             <h2 class="text-3xl font-semibold mb-4">Search for Historical Timelines</h2>
             <p class="text-gray-600 mb-6">Enter keywords to explore events and timelines from history.</p>
-            <form id="searchForm" class="flex justify-center items-center gap-4">
+            <form id="searchForm" class="flex justify-center items-center gap-4" action="results.html" method="GET">
                 <input 
                     type="text" 
                     id="searchInput" 
@@ -56,7 +56,7 @@
                     id="scrollLeft">
                     &lt;
                 </button>
-                <div class="timeline-track w-full h-28 rounded-lg flex items-center justify-start overflow-hidden" style="padding: 0 10px;" id="timelineTrack">
+                <div class="timeline-track w-full h-28 rounded-lg flex items-center justify-start overflow-hidden" style="padding: 0 10px;" id="timelineTrack"  onclick="window.location.href='results.html'">
                     <!-- Lines will be generated here -->
                 </div>
                 <button 
