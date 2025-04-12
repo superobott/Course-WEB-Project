@@ -337,6 +337,12 @@
   .bg-\[\#F2EFE7\] {
     background-color: #F2EFE7;
   }
+  .bg-\[\#d31d1d\] {
+    background-color: #d31d1d;
+  }
+  .bg-\[\#f51630\] {
+    background-color: #f51630;
+  }
   .bg-white {
     background-color: var(--color-white);
   }
@@ -400,6 +406,15 @@
   }
   .text-\[\#F2EFE7\] {
     color: #F2EFE7;
+  }
+  .text-\[\#d8073f\] {
+    color: #d8073f;
+  }
+  .text-\[\#d90606\] {
+    color: #d90606;
+  }
+  .text-\[\#e11d61\] {
+    color: #e11d61;
   }
   .text-gray-600 {
     color: var(--color-gray-600);

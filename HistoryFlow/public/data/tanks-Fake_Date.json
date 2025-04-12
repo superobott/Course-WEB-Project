@@ -1,0 +1,67 @@
+{
+    "timeline": {
+      "1916": [
+        {
+          "title": "Introduction of the Mark I",
+          "category": "World War I",
+          "description": "The British Mark I is the world's first-ever tank, marking the beginning of armored warfare."
+        }
+      ],
+      "1939": [
+        {
+          "title": "Introduction of the Panzer III",
+          "category": "World War II",
+          "description": "The German Panzer III is introduced and becomes one of the most widely used tanks during World War II."
+        }
+      ],
+      "1942": [
+        {
+          "title": "Battle of Kursk",
+          "category": "World War II",
+          "description": "The Battle of Kursk, the largest tank battle in history, takes place on the Eastern Front, with Soviet T-34s facing off against German Panthers and Tigers."
+        }
+      ],
+      "1944": [
+        {
+          "title": "Introduction of the Sherman Firefly",
+          "category": "World War II",
+          "description": "The British upgrade the M4 Sherman tank with a more powerful 17-pounder gun, increasing its effectiveness against German armor."
+        }
+      ],
+      "1952": [
+        {
+          "title": "Introduction of the T-55",
+          "category": "Cold War",
+          "description": "The Soviet Union introduces the T-55, one of the most widely produced tanks of the 20th century, serving in many conflicts."
+        }
+      ],
+      "1960": [
+        {
+          "title": "Introduction of the M60 Patton",
+          "category": "Cold War",
+          "description": "The M60 Patton, the U.S. Army's main battle tank during the Cold War, is introduced, offering improved armor and firepower."
+        }
+      ],
+      "1980": [
+        {
+          "title": "Introduction of the Leopard 2",
+          "category": "Modern Warfare",
+          "description": "Germany introduces the Leopard 2, regarded as one of the most advanced tanks in the world with cutting-edge technology and armor."
+        }
+      ],
+      "1991": [
+        {
+          "title": "Operation Desert Storm",
+          "category": "Modern Warfare",
+          "description": "The Gulf War sees the use of the M1 Abrams and other advanced tanks in combat, with rapid victories over Iraqi forces."
+        }
+      ],
+      "2010": [
+        {
+          "title": "Introduction of the T-14 Armata",
+          "category": "Modern Warfare",
+          "description": "Russia introduces the T-14 Armata, a next-generation main battle tank featuring an unmanned turret and advanced technology."
+        }
+      ]
+    }
+  }
