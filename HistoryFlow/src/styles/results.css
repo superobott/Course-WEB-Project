@@ -1,0 +1,98 @@
+/* Timeline container setup */
+.timeline-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow-x: auto;
+    width: 100%;
+    position: relative;
+}
+
+/* Main timeline container */
+.timeline-container {
+    display: flex;
+    align-items: flex-start;
+    position: relative;
+}
+
+/* Timeline line */
+.timeline-line {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #006A71;
+}
+
+/* Year container setup */
+.year-container {
+    position: relative;
+    display: inline-block;
+    width: 150px; /* Width of each year */
+    margin: 0 20px; /* Space between each year */
+    text-align: center;
+}
+
+/* Event box styling */
+.event-box {
+    background-color: #fff;
+    border: 1px solid #006A71;
+    padding: 10px;
+    width: 120px;
+    margin-top: 10px;
+    text-align: left;
+    border-radius: 8px;
+}
+
+/* Position event markers */
+.year-marker {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    font-weight: bold;
+    background-color: #006A71;
+    color: #fff;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/* Event items above and below the timeline */
+.event-item {
+    position: absolute;
+    width: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Even events go above the timeline */
+.event-item:nth-child(even) {
+    top: -60px; /* Adjust to move above the line */
+}
+
+/* Odd events go below the timeline */
+.event-item:nth-child(odd) {
+    top: 60px; /* Adjust to move below the line */
+}
+
+/* Scroll buttons for horizontal movement */
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #006A71;
+    color: #fff;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50%;
+}
+
+.scroll-left {
+    left: 10px;
+}
+
+.scroll-right {
+    right: 10px;
+}
