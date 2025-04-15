@@ -65,14 +65,14 @@ function displayTimelineData(data) {
     // Define the scale for year spacing
     const yearSpacing = 120; // Space between each year (adjust for layout)
 
-    years.forEach((year, index) => {
+    years.forEach((year, home) => {
         const yearData = data.timeline[year];
 
         // Create a container for this year's events
         const yearContainer = document.createElement('div');
         yearContainer.classList.add('year-container');
         yearContainer.style.position = 'relative';
-        yearContainer.style.marginTop = `${index * yearSpacing}px`;
+        yearContainer.style.marginTop = `${home * yearSpacing}px`;
 
         // Create the year marker
         const yearMarker = document.createElement('div');
@@ -88,13 +88,13 @@ function displayTimelineData(data) {
         eventsList.classList.add('events-list');
 
         // Create each event under this year
-        yearData.forEach((event, eventIndex) => {
+        yearData.forEach((event, eventhome) => {
             const eventItem = document.createElement('li');
             eventItem.classList.add('event-item');
             eventItem.style.position = 'relative';
 
             // Alternate the events left and right of the timeline
-            const isLeft = eventIndex % 2 === 0;
+            const isLeft = eventhome % 2 === 0;
             eventItem.style.left = isLeft ? '-200px' : '200px'; // Move events to the left or right
 
             // Create the event box
