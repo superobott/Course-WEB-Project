@@ -88,4 +88,34 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = `results.html?type=timeline&year=${year}`;
         }
     });
+
+    }
+    
+    /**
+     * Check if user is already logged in
+     * Redirect to home page if user data exists
+     */
+    function checkLoggedInStatus() {
+        const userData = localStorage.getItem('hfUser');
+        if (userData) {
+            // User is already logged in, redirect to home
+            window.location.href = 'home.html';
+        }
+    }
+    
+    // Uncomment to enable automatic redirect if user is already logged in
+    // checkLoggedInStatus();
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+  const loginButton = document.querySelector(".login-button");
+  const registerButton = document.querySelector(".register-button");
+
+  loginButton.addEventListener("click", () => {
+    window.location.href = "login.html";
+  });
+
+  registerButton.addEventListener("click", () => {
+    window.location.href = "register.html";
+  });
 });
