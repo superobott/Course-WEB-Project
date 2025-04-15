@@ -1,0 +1,56 @@
+/* General Styles */
+body {
+  background-color: #F2EFE7;
+  color: #006A71;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Form Container */
+form {
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+}
+
+/* Input Fields */
+input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #9ACBD0;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #48A6A7;
+  box-shadow: 0 0 5px #48A6A7;
+}
+
+/* Button */
+button {
+  background-color: #006A71;
+  color: #F2EFE7;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #48A6A7;
+}
+
+/* Links */
+a {
+  color: #48A6A7;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
