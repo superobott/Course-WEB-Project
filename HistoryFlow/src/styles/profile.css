@@ -108,6 +108,10 @@ input:focus, textarea:focus {
     box-shadow: 0 0 0 3px rgba(72, 166, 167, 0.2);
 }
 
+.flex-wrap {
+    gap: 24px; /* Adjust this value as needed */
+}
+
 /* Modal Styles */
 .modal {
     display: none;
@@ -382,4 +386,5 @@ input:focus, textarea:focus {
         width: 95%;
         margin: 10% auto;
     }
+
 }

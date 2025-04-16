@@ -204,7 +204,7 @@ function showToast(message, type) {
 
 // Planes Timeline
 function addPlanesTimeline() {
-    fetch('/HistoryFlow/src/planesData.json')
+    fetch('/HistoryFlow/public/data/planesData.json')
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
             return response.json();
@@ -266,14 +266,20 @@ function addPlanesTimeline() {
         });
 }
 
-// View Results Buttons
 function setupViewResultsButtons() {
     const viewResultsButtons = document.querySelectorAll('.view-results-btn');
     viewResultsButtons.forEach(button => {
         button.addEventListener('click', function (e) {
             const timelineItem = this.closest('.history-item');
             const timelineTitle = timelineItem.querySelector('h4').textContent;
+            const parentTab = timelineItem.closest('.tab-content').id;
 
+            // If the button is in the "Search History" tab, allow navigation
+            if (parentTab === 'search-history-content') {
+                return; // Proceed with the default navigation (e.g., to results.html?type=search&query=planes)
+            }
+
+            // For "Saved Timelines" tab, apply the existing logic
             if (timelineTitle !== 'Planes Timeline') {
                 e.preventDefault();
                 showToast('This timeline is no longer available', 'error');
@@ -294,17 +300,51 @@ function setupViewResultsButtons() {
                         }, 600);
                     });
                 }, 1000);
-            } else {
-                localStorage.setItem('returnUrl', window.location.href);
             }
         });
     });
 }
 
-// Initialize on Page Load
+function loadSearchHistory() {
+    const searchHistoryContainer = document.querySelector('#search-history-content .space-y-4');
+    const searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+
+    // Clear existing entries (remove hardcoded ones)
+    searchHistoryContainer.innerHTML = '';
+
+    searchHistory.forEach(search => {
+        const searchItem = document.createElement('div');
+        searchItem.className = 'history-item p-4 pl-6 bg-white rounded-lg';
+        searchItem.innerHTML = `
+            <div class="flex justify-between items-center">
+                <div>
+                    <h4 class="font-medium">${search.query}</h4>
+                    <p class="text-sm text-gray-600">Searched on ${new Date(search.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
+                </div>
+                <div class="flex gap-10">
+                    <a href="results.html?type=search&query=${encodeURIComponent(search.query)}" class="text-[#006A71] hover:underline view-results-btn">View Results</a>
+                    <button class="text-red-500 hover:text-red-700 delete-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        `;
+        searchHistoryContainer.appendChild(searchItem);
+    });
+
+    // Reattach delete button event listeners
+    setupDeleteButtons();
+    setupViewResultsButtons();
+}
+
+// Update the DOMContentLoaded event listener to include loadSearchHistory
 document.addEventListener('DOMContentLoaded', () => {
     setupTabNavigation();
     setupModals();
     setupForms();
     addPlanesTimeline();
+    setupViewResultsButtons();
+    loadSearchHistory();
 });

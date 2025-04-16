@@ -116,13 +116,13 @@
         </div>
 
         <!-- Tabs Section -->
-        <div class="mb-6 border-b border-gray-200">
-            <div class="flex flex-wrap">
-                <button class="tab-button px-6 py-3 active" data-tab="search-history">Search History</button>
-                <button class="tab-button px-6 py-3" data-tab="saved-timelines">Saved Timelines</button>
-                <button class="tab-button px-6 py-3" data-tab="settings">Account Settings</button>
-            </div>
+    <div class="mb-6 border-b border-gray-200">
+        <div class="flex flex-wrap gap-12"> <!-- Added gap-6 for increased spacing -->
+            <button class="tab-button px-6 py-3 active" data-tab="search-history">Search History</button>
+            <button class="tab-button px-6 py-3" data-tab="saved-timelines">Saved Timelines</button>
+            <button class="tab-button px-6 py-3" data-tab="settings">Account Settings</button>
         </div>
+    </div>
 
         <!-- Tab Contents -->
         <div class="tab-content active" id="search-history-content">
@@ -134,7 +134,7 @@
                             <h4 class="font-medium">World War II</h4>
                             <p class="text-sm text-gray-600">Searched on April 15, 2025</p>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex gap-10">
                             <a href="results.html?type=search&query=World%20War%20II" class="text-[#006A71] hover:underline view-results-btn">View Results</a>
                             <button class="text-red-500 hover:text-red-700 delete-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
