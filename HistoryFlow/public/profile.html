@@ -6,20 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Timeline History - My Profile</title>
     <link rel="stylesheet" href="/HistoryFlow/src/output.css">
-    <link rel="stylesheet" href="/HistoryFlow/src/profile.css">
-    <script src="../src/logic/profile.js" defer></script>
+    <link rel="stylesheet" href="/HistoryFlow/src/styles/profile.css">
+    <script src="/HistoryFlow/src/logic/profile.js" defer></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
     <!-- Header Section -->
     <header class="bg-[#006A71] text-[#F2EFE7] py-6">
         <div class="container mx-auto text-center relative">
-            <!-- Home Button -->
-            <a href="home.html" class="absolute left-4 top-1/2 -translate-y-1/2 p-2 hover:bg-[#48A6A7] rounded-full transition-colors">
+            <a href="index.html" class="absolute left-4 top-1/2 -translate-y-1/2 p-2 hover:bg-[#48A6A7] rounded-full transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                 </svg>
             </a>
-            <!-- Profile Logo Button (Active) -->
             <button class="absolute right-4 top-1/2 -translate-y-1/2 p-2 bg-[#48A6A7] rounded-full">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -33,40 +31,96 @@
     <!-- Main Content -->
     <main class="container mx-auto py-8 px-4">
         <!-- Profile Info Section -->
-        <section class="profile-card p-6 mb-8">
+        <section class="profile-card p-6 mb-8" id="profileSection">
             <div class="flex flex-col md:flex-row items-center">
-                <div class="w-32 h-32 bg-[#9ACBD0] rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-8">
+                <div class="w-32 h-32 bg-[#9ACBD0] rounded-full flex items-center justify-center mb-4 md:mb-0 md:mr-8" id="profileImage">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-[#006A71]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </div>
                 <div class="md:flex-1">
-                    <h2 class="text-2xl font-bold text-[#006A71]">John Doe</h2>
-                    <p class="text-gray-600 mb-4">Member since April 2025</p>
+                    <h2 class="text-2xl font-bold text-[#006A71]" id="profileName">John Doe</h2>
+                    <p class="text-gray-600 mb-4" id="profileMemberSince">Member since April 2025</p>
                     <div class="flex flex-wrap gap-4">
-                        <button class="base-button" id="editProfileBtn">
-                            Edit Profile
-                        </button>
-                        <button class="base-button" style="background-color: #48A6A7; border-color: #48A6A7;">
-                            Manage Subscriptions
-                        </button>
+                        <button class="base-button" id="editProfileBtn">Edit Profile</button>
+                        <button class="base-button" style="background-color: #48A6A7; border-color: #48A6A7;">Manage Subscriptions</button>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- Edit Profile Modal -->
+        <div id="editProfileModal" class="modal">
+            <div class="modal-content profile-card">
+                <span class="close">×</span>
+                <h2 class="text-2xl font-bold text-[#006A71] mb-4">Edit Profile</h2>
+                <form id="editProfileForm">
+                    <div class="mb-4">
+                        <label for="fullName" class="block text-gray-700 mb-2">Full Name</label>
+                        <input type="text" id="fullName" name="fullName" value="John Doe" class="w-full px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]">
+                    </div>
+                    <div class="mb-4">
+                        <label for="profileBio" class="block text-gray-700 mb-2">Bio</label>
+                        <textarea id="profileBio" name="profileBio" rows="3" class="w-full px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]">History enthusiast with a passion for exploring ancient civilizations and modern events.</textarea>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Profile Image</label>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 bg-[#9ACBD0] rounded-full flex items-center justify-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-[#006A71]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <input type="file" id="profileImageInput" accept="image/*" class="hidden">
+                                <button type="button" class="base-button" id="chooseImageBtn" style="padding: 0.5rem 1rem;">Choose Image</button>
+                                <p class="text-sm text-gray-600 mt-1">Maximum size: 2MB</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 mb-2">Interests</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="flex items-center">
+                                <input type="checkbox" id="interest-ancient" name="interests[]" value="ancient" checked class="mr-2">
+                                <label for="interest-ancient">Ancient History</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="interest-medieval" name="interests[]" value="medieval" checked class="mr-2">
+                                <label for="interest-medieval">Medieval Period</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="interest-modern" name="interests[]" value="modern" class="mr-2">
+                                <label for="interest-modern">Modern History</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="interest-wars" name="interests[]" value="wars" checked class="mr-2">
+                                <label for="interest-wars">Wars & Conflicts</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="interest-aviation" name="interests[]" value="aviation" checked class="mr-2">
+                                <label for="interest-aviation">Aviation History</label>
+                            </div>
+                            <div class="flex items-center">
+                                <input type="checkbox" id="interest-tech" name="interests[]" value="tech" class="mr-2">
+                                <label for="interest-tech">Technological Advances</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex justify-end">
+                        <button type="button" class="base-button bg-gray-400 border-gray-400 mr-2" id="cancelEditBtn">Cancel</button>
+                        <button type="submit" class="base-button">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
         <!-- Tabs Section -->
         <div class="mb-6 border-b border-gray-200">
             <div class="flex flex-wrap">
-                <button class="tab-button px-6 py-3 active" data-tab="search-history">
-                    Search History
-                </button>
-                <button class="tab-button px-6 py-3" data-tab="saved-timelines">
-                    Saved Timelines
-                </button>
-                <button class="tab-button px-6 py-3" data-tab="settings">
-                    Account Settings
-                </button>
+                <button class="tab-button px-6 py-3 active" data-tab="search-history">Search History</button>
+                <button class="tab-button px-6 py-3" data-tab="saved-timelines">Saved Timelines</button>
+                <button class="tab-button px-6 py-3" data-tab="settings">Account Settings</button>
             </div>
         </div>
 
@@ -81,8 +135,8 @@
                             <p class="text-sm text-gray-600">Searched on April 15, 2025</p>
                         </div>
                         <div class="flex gap-2">
-                            <a href="results.html?type=search&query=World%20War%20II" class="text-[#006A71] hover:underline">View Results</a>
-                            <button class="text-red-500 hover:text-red-700">
+                            <a href="results.html?type=search&query=World%20War%20II" class="text-[#006A71] hover:underline view-results-btn">View Results</a>
+                            <button class="text-red-500 hover:text-red-700 delete-btn">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                                 </svg>
@@ -90,38 +144,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="history-item p-4 pl-6 bg-white rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="font-medium">Ancient Egypt</h4>
-                            <p class="text-sm text-gray-600">Searched on April 14, 2025</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="results.html?type=search&query=Ancient%20Egypt" class="text-[#006A71] hover:underline">View Results</a>
-                            <button class="text-red-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="history-item p-4 pl-6 bg-white rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="font-medium">Industrial Revolution</h4>
-                            <p class="text-sm text-gray-600">Searched on April 12, 2025</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="results.html?type=search&query=Industrial%20Revolution" class="text-[#006A71] hover:underline">View Results</a>
-                            <button class="text-red-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Additional search items omitted for brevity -->
             </div>
             <div class="mt-6 text-center">
                 <button class="base-button">View All Search History</button>
@@ -131,38 +154,7 @@
         <div class="tab-content" id="saved-timelines-content">
             <h3 class="text-xl font-semibold text-[#006A71] mb-4">Your Saved Timelines</h3>
             <div class="space-y-4">
-                <div class="history-item p-4 pl-6 bg-white rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="font-medium">World History: 1900-2000</h4>
-                            <p class="text-sm text-gray-600">Saved on April 14, 2025</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="timeline.html?id=world-1900-2000" class="text-[#006A71] hover:underline">View Timeline</a>
-                            <button class="text-red-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div class="history-item p-4 pl-6 bg-white rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="font-medium">Ancient Civilizations</h4>
-                            <p class="text-sm text-gray-600">Saved on April 10, 2025</p>
-                        </div>
-                        <div class="flex gap-2">
-                            <a href="timeline.html?id=ancient-civs" class="text-[#006A71] hover:underline">View Timeline</a>
-                            <button class="text-red-500 hover:text-red-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Timelines will be populated by JavaScript -->
             </div>
             <div class="mt-6 text-center">
                 <button class="base-button">View All Saved Timelines</button>
@@ -199,12 +191,30 @@
                 </form>
             </div>
         </div>
+
+        <!-- Delete Confirmation Dialog -->
+        <div id="deleteConfirmation" class="delete-confirmation">
+            <div class="delete-confirmation-content">
+                <h3>Confirm Deletion</h3>
+                <p>Are you sure you want to delete "<span id="deleteItemTitle"></span>"?</p>
+                <div class="buttons">
+                    <button class="base-button cancel" id="cancelDeleteBtn">Cancel</button>
+                    <button class="base-button delete" id="confirmDeleteBtn">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Notification -->
+        <div id="toastNotification" class="toast-notification">
+            <span class="toast-icon"></span>
+            <span id="toastMessage"></span>
+        </div>
     </main>
 
     <!-- Footer Section -->
     <footer class="bg-[#006A71] text-[#F2EFE7] py-4 mt-auto">
         <div class="container mx-auto text-center">
-            <p>&copy; 2025 Timeline History Website. All rights reserved.</p>
+            <p>© 2025 Timeline History Website. All rights reserved.</p>
         </div>
     </footer>
 </body>
