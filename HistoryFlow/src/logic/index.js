@@ -88,4 +88,12 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = `results.html?type=timeline&year=${year}`;
         }
     });
+
+    // Add profile button navigation
+    const profileButton = document.querySelector('header button.absolute.right-4');
+    if (profileButton) {
+        profileButton.addEventListener('click', function() {
+            window.location.href = 'profile.html';
+        });
+    }
 });
