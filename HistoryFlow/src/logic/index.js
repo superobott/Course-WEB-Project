@@ -89,11 +89,4 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Add profile button navigation
-    const profileButton = document.querySelector('header button.absolute.right-4');
-    if (profileButton) {
-        profileButton.addEventListener('click', function() {
-            window.location.href = 'profile.html';
-        });
-    }
 });
