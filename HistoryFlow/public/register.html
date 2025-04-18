@@ -140,6 +140,34 @@
                         </div>
                         <div id="confirmPasswordError" class="error-message" role="alert" hidden></div>
                     </div>
+
+                    <!-- Security Question Fields -->
+                    <div class="form-group">
+                        <label for="securityQuestion" class="form-label">Security Question</label>
+                        <select
+                            id="securityQuestion"
+                            name="securityQuestion"
+                            class="form-input"
+                            required
+                        >
+                            <option value="">Select a security question</option>
+                            <option value="pet">What was your first pet's name?</option>
+                            <option value="city">In which city were you born?</option>
+                            <option value="school">What was the name of your first school?</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="securityAnswer" class="form-label">Security Answer</label>
+                        <input
+                            type="text"
+                            id="securityAnswer"
+                            name="securityAnswer"
+                            class="form-input"
+                            required
+                            placeholder="Enter your answer"
+                        >
+                    </div>
                     
                     <!-- GDPR Consent -->
                     <div class="form-group checkbox-group">
