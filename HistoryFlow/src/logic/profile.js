@@ -324,7 +324,7 @@ function loadSearchHistory() {
                 <div class="flex gap-10">
                     <a href="results.html?type=search&query=${encodeURIComponent(search.query)}" class="text-[#006A71] hover:underline view-results-btn">View Results</a>
                     <button class="text-red-500 hover:text-red-700 delete-btn">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
                     </button>
@@ -338,6 +338,108 @@ function loadSearchHistory() {
     setupDeleteButtons();
     setupViewResultsButtons();
 }
+
+// Initial user data structure
+const defaultUserData = {
+    fullName: 'John Doe',
+    bio: 'History enthusiast with a passion for exploring ancient civilizations and modern events.',
+    memberSince: 'April 2025',
+    email: 'john.doe@example.com',
+    interests: ['ancient', 'medieval', 'wars', 'aviation'],
+    notifications: {
+        email: true,
+        news: true
+    },
+    searchHistory: [
+        {
+            query: 'World War II',
+            date: 'April 15, 2025'
+        }
+    ]
+};
+
+// Load user data from localStorage or use default
+function loadUserData() {
+    const storedData = localStorage.getItem('userData');
+    return storedData ? JSON.parse(storedData) : defaultUserData;
+}
+
+// Save user data to localStorage
+function saveUserData(data) {
+    localStorage.setItem('userData', JSON.stringify(data));
+}
+
+// Initialize page with user data
+function initializeProfile() {
+    const userData = loadUserData();
+    
+    // Update profile section
+    document.getElementById('profileName').textContent = userData.fullName;
+    document.getElementById('profileMemberSince').textContent = `Member since ${userData.memberSince}`;
+    
+    // Update form fields
+    document.getElementById('fullName').value = userData.fullName;
+    document.getElementById('profileBio').value = userData.bio;
+    document.getElementById('email').value = userData.email;
+    
+    // Update interests
+    userData.interests.forEach(interest => {
+        const checkbox = document.getElementById(`interest-${interest}`);
+        if (checkbox) checkbox.checked = true;
+    });
+
+    // Update notification preferences
+    document.getElementById('emailNotifications').checked = userData.notifications.email;
+    document.getElementById('newsUpdates').checked = userData.notifications.news;
+}
+
+// Handle form submission
+document.getElementById('editProfileForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const userData = loadUserData();
+    userData.fullName = document.getElementById('fullName').value;
+    userData.bio = document.getElementById('profileBio').value;
+    
+    // Get selected interests
+    userData.interests = [];
+    document.querySelectorAll('input[name="interests[]"]:checked').forEach(checkbox => {
+        userData.interests.push(checkbox.value);
+    });
+    
+    saveUserData(userData);
+    initializeProfile();
+    
+    // Close modal and show success message
+    document.getElementById('editProfileModal').style.display = 'none';
+    showToast('Profile updated successfully!');
+});
+
+// Handle account settings form
+document.getElementById('accountSettingsForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const userData = loadUserData();
+    userData.email = document.getElementById('email').value;
+    userData.notifications = {
+        email: document.getElementById('emailNotifications').checked,
+        news: document.getElementById('newsUpdates').checked
+    };
+    
+    saveUserData(userData);
+    showToast('Settings saved successfully!');
+});
+
+// Show toast message
+function showToast(message) {
+    const toast = document.getElementById('toastNotification');
+    document.getElementById('toastMessage').textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initializeProfile);
 
 // Update the DOMContentLoaded event listener to include loadSearchHistory
 document.addEventListener('DOMContentLoaded', () => {
