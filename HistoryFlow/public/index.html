@@ -4,68 +4,34 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Timeline History - Home Search</title>
-    <link rel="stylesheet" href="assets/css/tailwind.css">
+    <title>Timeline History - home</title>
+    <link rel="stylesheet" href="/HistoryFlow/src/output.css">
+    <link rel="stylesheet" href="/HistoryFlow/src/styles/index.css">
+    <script src="../src/logic/index.js"></script>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-[#F2EFE7] text-[#006A71] min-h-screen flex flex-col">
     <!-- Header Section -->
-    <header class="bg-blue-600 text-white py-6">
+    <header class="bg-[#006A71] text-[#F2EFE7] py-6">
         <div class="container mx-auto text-center">
-            <h1 class="text-4xl font-bold">Welcome to Timeline History</h1>
+            <h1 class="text-4xl font-bold">Welcome to HistoryFlow</h1>
             <p class="text-lg mt-2">Discover historical events, timelines, and more!</p>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="bg-white py-12">
-        <div class="container mx-auto text-center">
-            <h2 class="text-3xl font-semibold mb-4">Search for Historical Timelines</h2>
-            <p class="text-gray-600 mb-6">Enter keywords to explore events and timelines from history.</p>
-            <form id="searchForm" class="flex justify-center items-center gap-4">
-                <input 
-                    type="text" 
-                    id="searchInput" 
-                    name="searchInput" 
-                    placeholder="Enter keywords..." 
-                    class="w-1/2 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                >
-                <button 
-                    type="submit" 
-                    class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition">
-                    Search
-                </button>
-            </form>
-        </div>
-    </section>
-
-    <!-- Timeline Section -->
-    <section id="timelineSection" class="bg-gray-50 py-12">
-        <div class="container mx-auto">
-            <h2 class="text-2xl font-semibold text-center mb-6">Explore the Timeline</h2>
-            <div class="timeline-roller flex items-center justify-center gap-4">
-                <button 
-                    class="scroll-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition" 
-                    id="scrollLeft">
-                    &lt;
-                </button>
-                <div class="timeline-track bg-gray-200 w-full h-24 rounded-lg flex items-center justify-center">
-                    <div class="big-lines bg-blue-600 h-16 w-1 mx-2"></div>
-                    <div class="small-lines bg-blue-400 h-8 w-1 mx-1"></div>
-                    <div class="big-lines bg-blue-600 h-16 w-1 mx-2"></div>
-                    <div class="small-lines bg-blue-400 h-8 w-1 mx-1"></div>
-                </div>
-                <button 
-                    class="scroll-btn bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition" 
-                    id="scrollRight">
-                    &gt;
-                </button>
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <section class="py-12 text-center">
+            <h2 class="text-3xl font-semibold mb-4">Explore History</h2>
+            <p class="text-gray-600 mb-6">Start your journey by logging in or registering.</p>
+            <div class="flex justify-center gap-4">
+                <a href="login.html" class="base-button">Login</a>
+                <a href="register.html" class="base-button">Register</a>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <!-- Footer Section -->
-    <footer class="bg-blue-600 text-white py-4">
+    <footer class="bg-[#006A71] text-[#F2EFE7] py-4 mt-auto">
         <div class="container mx-auto text-center">
             <p>&copy; 2025 Timeline History Website. All rights reserved.</p>
         </div>
