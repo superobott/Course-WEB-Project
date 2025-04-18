@@ -1,73 +1,170 @@
+<!-- login.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!--מאפשר עיצוב רספונסיבי במכשירים ניידים-->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="HistoryFlow - Login" />
+  <meta property="og:description" content="Access your HistoryFlow account to explore interactive historical timelines and events." />
+  <meta property="og:image" content="/HistoryFlow/assets/images/historyflow-social.jpg" />
+  <meta property="og:url" content="historyflow.example.com/login.html" />
+  <meta property="og:type" content="website" />
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="historyflow.example.com/login.html" />
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';" />
+  
   <title>HistoryFlow – Login</title>
-  <!-- Core stylesheet -->
-  <link rel="stylesheet" href="/HistoryFlow/src/output.css" />
-  <link rel="stylesheet" href="/HistoryFlow/src/styles/home.css" />
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="/HistoryFlow/src/styles/login.css">
 </head>
-<body class="bg-[#F2EFE7] text-[#006A71] min-h-screen flex flex-col">
+<body>
   <!-- Header Section -->
-  <header class="bg-[#006A71] text-[#F2EFE7] py-6">
-    <div class="container mx-auto text-center">
-      <h1 class="text-4xl font-bold">HistoryFlow</h1>
-      <p class="text-lg mt-2">Explore the timeline of history</p>
+  <header class="header">
+    <div class="container text-center">
+      <div class="logo-container">
+        <img src="/HistoryFlow/assets/images/logo-blue.png" alt="HistoryFlow Logo" width="150" height="50" class="logo" loading="lazy">
+      </div>
+      <h1 class="header-title">HistoryFlow</h1>
+      <p class="header-subtitle">Explore the timeline of history</p>
     </div>
   </header>
 
   <!-- Login Form Section -->
-  <main class="flex-grow">
-    <section class="py-12">
-      <div class="container mx-auto max-w-md bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-2xl font-semibold text-center mb-6">Login to Your Account</h2>
-        <form id="loginForm" class="space-y-4" action="dashboard.html" method="POST">
-          <div>
-            <label for="email" class="block text-[#006A71]/80 mb-1">Email</label>
+  <main class="main-content">
+    <section class="form-section">
+      <div class="container card">
+        <!-- Rate Limit Alert (Hidden by Default) -->
+        <div id="rateLimitNotice" class="alert-box alert-error hidden">
+          Too many failed attempts. Please try again in <span id="cooldownTimer">30</span> seconds.
+        </div>
+        
+        <h2 class="form-title">Login to Your Account</h2>
+        
+        <form id="loginForm" class="form-container" action="/api/auth/login" method="POST">
+          <!-- CSRF Token and Honeypot -->
+          <input type="hidden" id="csrfToken" name="csrfToken" value="">
+          <div class="honeypot-field">
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+          
+          <!-- Error Container -->
+          <div id="errorContainer" class="alert-box alert-error hidden" role="alert" aria-live="polite"></div>
+          
+          <!-- Email Field -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
             <input
               type="email"
               id="email"
               name="email"
-              class="w-full px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]"
+              class="form-input"
               placeholder="your@email.com"
-              aria-label="Email address"
               required
+              autocomplete="email"
+              aria-describedby="emailError"
+              autofocus
             />
+            <div id="emailError" class="error-message" role="alert" hidden></div>
           </div>
-          <div>
-            <label for="password" class="block text-[#006A71]/80 mb-1">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              class="w-full px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]"
-              placeholder="••••••••"
-              aria-label="Password"
-              required
-            />
+          
+          <!-- Password Field -->
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+                aria-describedby="passwordError"
+              />
+              <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">
+                <span class="eye-icon">👁️</span>
+              </button>
+            </div>
+            <div id="passwordError" class="error-message" role="alert" hidden></div>
           </div>
-          <div class="pt-2">
-            <button
-              type="submit"
-              class="base-button w-full"
-              aria-label="Login">
-              Login
+          
+          <!-- Forgot Password Link -->
+          <div class="link-container">
+            <a href="forgot-password.html" class="link">Forgot password?</a>
+          </div>
+          
+          <!-- Submit Button -->
+          <div class="button-container">
+            <button 
+              type="submit" 
+              id="loginButton"
+              aria-label="Login to account"
+              class="btn btn-primary">
+              <span>Login</span>
+              <div class="spinner hidden"></div>
             </button>
           </div>
         </form>
-        <div class="mt-6 text-center text-[#006A71]/80">
-          <a href="register.html" class="text-[#48A6A7] hover:underline">New here? Register</a>
+        
+        <!-- Success/Error Message Banner -->
+        <div id="messageBanner" class="alert-box hidden" role="alert"></div>
+        
+        <!-- Social Login -->
+        <div class="social-login">
+          <div class="divider">
+            <span class="divider-text">Or login with</span>
+          </div>
+          <div class="social-buttons">
+            <button type="button" class="social-button" aria-label="Login with Google">
+              <span class="social-icon">G</span>
+              Google
+            </button>
+            <button type="button" class="social-button" aria-label="Login with GitHub">
+              <span class="social-icon">GH</span>
+              GitHub
+            </button>
+          </div>
+        </div>
+        
+        <!-- Register Link -->
+        <div class="login-link-container">
+          <a href="register.html" class="login-link" aria-label="Go to registration page">
+            New here? Register
+          </a>
         </div>
       </div>
     </section>
   </main>
 
   <!-- Footer Section -->
-  <footer class="bg-[#006A71] text-[#F2EFE7] py-4 mt-auto">
-    <div class="container mx-auto text-center">
-      <p>&copy; 2025 Timeline History Website. All rights reserved.</p>
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2025 HistoryFlow. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="/terms.html" class="footer-link">Terms</a>
+        <a href="/privacy.html" class="footer-link">Privacy</a>
+        <a href="/contact.html" class="footer-link">Contact</a>
+      </div>
     </div>
   </footer>
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookieConsent" class="cookie-banner hidden">
+    <p>We use cookies to enhance your experience. By continuing to visit this site, you agree to our use of cookies.</p>
+    <div class="cookie-buttons">
+      <button id="acceptCookies" class="cookie-btn accept">Accept</button>
+      <button id="rejectCookies" class="cookie-btn reject">Reject</button>
+    </div>
+  </div>
+
+  <!-- Login Script -->
+  <script src="login.js"></script>
 </body>
 </html>
