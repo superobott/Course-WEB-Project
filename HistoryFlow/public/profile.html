@@ -7,6 +7,32 @@
     <title>Timeline History - My Profile</title>
     <link rel="stylesheet" href="/HistoryFlow/src/output.css">
     <link rel="stylesheet" href="/HistoryFlow/src/styles/profile.css">
+    <script>
+        const userProfile = JSON.parse(localStorage.getItem('userProfile')) || {};
+        // Populate profile data when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('profileName').textContent = userProfile.fullName || 'John Doe';
+            document.getElementById('profileBio').textContent = userProfile.bio || 'No bio available';
+            document.getElementById('profileEmail').textContent = userProfile.email || 'email@example.com';
+            document.getElementById('fullName').value = userProfile.fullName || '';
+            
+            // Update interests
+            const interestsContainer = document.getElementById('profileInterests');
+            if (userProfile.interests && userProfile.interests.length > 0) {
+                interestsContainer.innerHTML = userProfile.interests
+                    .map(interest => `<span class="inline-block bg-[#9ACBD0] text-[#006A71] px-3 py-1 rounded-full mr-2 mb-2">${interest}</span>`)
+                    .join('');
+            }
+
+            // Update form checkboxes
+            if (userProfile.interests) {
+                userProfile.interests.forEach(interest => {
+                    const checkbox = document.getElementById(`interest-${interest}`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+        });
+    </script>
     <script src="/HistoryFlow/src/logic/profile.js" defer></script>
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
@@ -39,8 +65,10 @@
                     </svg>
                 </div>
                 <div class="md:flex-1">
-                    <h2 class="text-2xl font-bold text-[#006A71]" id="profileName">John Doe</h2>
-                    <p class="text-gray-600 mb-4" id="profileMemberSince">Member since April 2025</p>
+                    <h2 class="text-2xl font-bold mb-2" id="profileName"></h2>
+                    <p class="text-gray-600 mb-4" id="profileBio"></p>
+                    <p class="text-gray-600 mb-4" id="profileEmail"></p>
+                    <div class="mb-4" id="profileInterests"></div>
                     <div class="flex flex-wrap gap-10">
                         <button class="base-button" id="editProfileBtn">Edit Profile</button>
                     </div>
@@ -60,7 +88,7 @@
                     </div>
                     <div class="mb-4">
                         <label for="profileBio" class="block text-gray-700 mb-2">Bio</label>
-                        <textarea id="profileBio" name="profileBio" rows="3" class="w-full px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]">History enthusiast with a passion for exploring ancient civilizations and modern events.</textarea>
+                        <textarea name="bio" id="profileBio" rows="4" class="w-full px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]" placeholder="Tell us about yourself..."></textarea>
                     </div>
                     <div class="mb-4">
                         <label class="block text-gray-700 mb-2">Profile Image</label>
@@ -115,34 +143,19 @@
         </div>
 
         <!-- Tabs Section -->
-    <div class="mb-6 border-b border-gray-200">
-        <div class="flex flex-wrap gap-12"> <!-- Added gap-6 for increased spacing -->
-            <button class="tab-button px-6 py-3 active" data-tab="search-history">Search History</button>
-            <button class="tab-button px-6 py-3" data-tab="saved-timelines">Saved Timelines</button>
-            <button class="tab-button px-6 py-3" data-tab="settings">Account Settings</button>
+        <div class="mb-6 border-b border-gray-200">
+            <div class="flex flex-wrap gap-12">
+                <button class="tab-button px-6 py-3 active" data-tab="search-history">Search History</button>
+                <button class="tab-button px-6 py-3" data-tab="saved-timelines">Saved Timelines</button>
+                <button class="tab-button px-6 py-3" data-tab="settings">Account Settings</button>
+            </div>
         </div>
-    </div>
 
         <!-- Tab Contents -->
         <div class="tab-content active" id="search-history-content">
             <h3 class="text-xl font-semibold text-[#006A71] mb-4">Recent Searches</h3>
             <div class="space-y-4">
-                <div class="history-item p-4 pl-6 bg-white rounded-lg">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h4 class="font-medium">World War II</h4>
-                            <p class="text-sm text-gray-600">Searched on April 15, 2025</p>
-                        </div>
-                        <div class="flex gap-10">
-                            <a href="results.html?type=search&query=ww2&returnTo=profile" class="text-[#006A71] hover:underline view-results-btn">View Results</a>
-                            <button class="text-red-500 hover:text-red-700 delete-btn">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Search history items will be populated by JavaScript -->
             </div>
             <div class="mt-6 text-center">
                 <button class="base-button">View All Search History</button>
@@ -151,30 +164,7 @@
         <div class="tab-content" id="saved-timelines-content">
             <h3 class="text-xl font-semibold text-[#006A71] mb-4">Your Saved Timelines</h3>
             <div class="space-y-4">
-                <div class="history-item p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-grow">
-                            <h4 class="font-medium text-lg mb-1">Planes</h4>
-                            <p class="text-sm text-gray-600 mb-2">Saved on April 15, 2025</p>
-                            <p class="text-sm text-gray-700">Contains 15 events • Last modified 2 days ago</p>
-                        </div>
-                        <div class="flex gap-3 items-center">
-                            <a href="http://127.0.0.1:5500/HistoryFlow/public/results.html?type=search&query=planes" 
-                               class="text-[#006A71] hover:text-[#48A6A7] transition-colors flex items-center gap-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                <span>View</span>
-                            </a>
-                            <button class="text-red-500 hover:text-red-700 transition-colors delete-btn p-1">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <!-- Saved timelines will be populated by JavaScript -->
             </div>
             <div class="mt-6 flex justify-center">
                 <button class="base-button text-sm px-4 py-2 flex items-center gap-2">
@@ -185,7 +175,6 @@
                 </button>
             </div>
         </div>
-
         <div class="tab-content" id="settings-content">
             <h3 class="text-xl font-semibold text-[#006A71] mb-4">Account Settings</h3>
             <div class="profile-card p-6">
