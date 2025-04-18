@@ -594,3 +594,62 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error(`[ERROR] ${errorType}:`, error);
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const registerForm = document.getElementById('registerForm');
+
+    registerForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // Get form data
+        const formData = {
+            username: document.getElementById('name').value,
+            email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+            securityQuestion: document.getElementById('securityQuestion').value,
+            securityAnswer: document.getElementById('securityAnswer').value
+        };
+
+        // Get existing users or initialize empty array
+        const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+        // Check if user already exists
+        if (users.some(user => user.email === formData.email)) {
+            showError('Email already registered');
+            return;
+        }
+
+        // Add new user
+        users.push({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password, // In a real app, never store plain passwords
+            securityQuestion: formData.securityQuestion,
+            securityAnswer: formData.securityAnswer,
+            registrationDate: new Date().toISOString(),
+            id: generateUserId()
+        });
+
+        // Save updated users array
+        localStorage.setItem('users', JSON.stringify(users));
+
+        // Show success message
+        const successMessage = document.getElementById('successMessage');
+        successMessage.hidden = false;
+
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+            window.location.href = 'login.html';
+        }, 2000);
+    });
+});
+
+function showError(message) {
+    const errorContainer = document.getElementById('errorContainer');
+    errorContainer.textContent = message;
+    errorContainer.hidden = false;
+}
+
+function generateUserId() {
+    return 'user_' + Math.random().toString(36).substr(2, 9);
+}
