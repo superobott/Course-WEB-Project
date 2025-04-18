@@ -1,9 +1,7 @@
-<!-- register.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <!--מאפשר עיצוב רספונסיבי במכשירים ניידים-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Join HistoryFlow to explore historical events and timelines. Create your account today.">
     
@@ -13,6 +11,9 @@
     <meta property="og:image" content="/HistoryFlow/assets/images/historyflow-preview.jpg">
     <meta property="og:url" content="historyflow.example.com/register.html">
     <meta property="og:type" content="website">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';" />
     
     <title>HistoryFlow - Register</title>
     
@@ -52,25 +53,6 @@
                     <!-- Honeypot field (hidden) -->
                     <div class="honeypot-field">
                         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
-                    </div>
-                    
-                    <!-- Username field -->
-                    <div class="form-group">
-                        <label for="name" class="form-label">Username</label>
-                        <input 
-                            type="text" 
-                            id="name"
-                            name="username" 
-                            placeholder="Choose a username" 
-                            class="form-input" 
-                            required
-                            minlength="3"
-                            maxlength="30"
-                            autocomplete="username"
-                            aria-describedby="nameRequirements nameError"
-                        >
-                        <div id="nameRequirements" class="input-requirements">3-30 characters, letters and numbers only</div>
-                        <div id="nameError" class="error-message" role="alert" hidden></div>
                     </div>
                     
                     <!-- Email field -->
@@ -149,12 +131,14 @@
                             name="securityQuestion"
                             class="form-input"
                             required
+                            aria-describedby="securityQuestionError"
                         >
                             <option value="">Select a security question</option>
                             <option value="pet">What was your first pet's name?</option>
                             <option value="city">In which city were you born?</option>
                             <option value="school">What was the name of your first school?</option>
                         </select>
+                        <div id="securityQuestionError" class="error-message" role="alert" hidden></div>
                     </div>
 
                     <div class="form-group">
@@ -166,7 +150,9 @@
                             class="form-input"
                             required
                             placeholder="Enter your answer"
+                            aria-describedby="securityAnswerError"
                         >
+                        <div id="securityAnswerError" class="error-message" role="alert" hidden></div>
                     </div>
                     
                     <!-- GDPR Consent -->
@@ -248,7 +234,6 @@
     </script>
     
     <!-- Main registration script -->
-    <script src="register.js"></script>
-    <script src="/HistoryFlow/src/logic/register.js"></script>
+    <script src="/HistoryFlow/src/logic/register.js" defer></script>
 </body>
 </html>
