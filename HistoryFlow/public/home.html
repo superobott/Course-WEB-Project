@@ -47,7 +47,7 @@
         </div>
     </section>
 
-    <!-- Timeline Section -->
+        <!-- Timeline Section -->
     <section id="timelineSection" class="bg-[#F2EFE7] py-12">
         <div class="container mx-auto">
             <h2 class="text-2xl font-semibold text-center mb-6">Explore the Timeline</h2>
@@ -57,7 +57,10 @@
                     id="scrollLeft">
                     &lt;
                 </button>
-                <div class="timeline-track w-full h-28 rounded-lg flex items-center justify-start overflow-hidden" style="padding: 0 10px;" id="timelineTrack"  onclick="window.location.href='results.html'">
+                <!-- Removed the onclick attribute from the timeline track -->
+                <div class="timeline-track w-full h-28 rounded-lg flex items-center justify-start overflow-hidden" 
+                    style="padding: 0 10px;" 
+                    id="timelineTrack">
                     <!-- Lines will be generated here -->
                 </div>
                 <button 
