@@ -1,22 +1,27 @@
 // Local Storage Keys
 const STORAGE_KEYS = {
-    PROFILE: 'userProfile',
+    PROFILE: 'users',  // Changed to match registration storage key
     SEARCH_HISTORY: 'searchHistory',
     SAVED_TIMELINES: 'savedTimelines'
 };
 
 // Initialize default data
 const defaultProfile = {
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    memberSince: 'April 2025',
-    bio: 'History enthusiast with a passion for exploring ancient civilizations and modern events.',
+    email: '',
+    firstName: '',
+    lastName: '',
+    password: '',
+    securityQuestion: '',
+    securityAnswer: '',
+    registerDate: new Date().toISOString(),
+    gdprConsent: false,
     interests: ['ancient', 'medieval', 'wars', 'aviation'],
     emailNotifications: true,
     newsUpdates: true,
-    password: 'defaultpassword123' // You should implement proper password hashing in production
+    bio: 'History enthusiast with a passion for exploring ancient civilizations and modern events.'
 };
 
+// Initialize default data
 const defaultSearchHistory = [
     {
         id: '1',
@@ -44,7 +49,7 @@ function initializeLocalStorage() {
         localStorage.removeItem(test);
 
         if (!localStorage.getItem(STORAGE_KEYS.PROFILE)) {
-            localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify(defaultProfile));
+            localStorage.setItem(STORAGE_KEYS.PROFILE, JSON.stringify([defaultProfile]));
         }
         if (!localStorage.getItem(STORAGE_KEYS.SEARCH_HISTORY)) {
             localStorage.setItem(STORAGE_KEYS.SEARCH_HISTORY, JSON.stringify(defaultSearchHistory));
@@ -160,21 +165,48 @@ function showToast(message) {
 // Profile management functions
 function loadProfile() {
     try {
-        const profile = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROFILE));
-        document.getElementById('profileName').textContent = profile.name;
+        const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.PROFILE)) || [];
+        // Get current user's email from session
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        
+        if (!currentUser || !currentUser.email) {
+            console.error('No user session found');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Find current user's profile
+        const profile = users.find(user => user.email === currentUser.email);
+        
+        if (!profile) {
+            console.error('User profile not found');
+            window.location.href = 'login.html';
+            return;
+        }
+
+        // Update profile display
+        document.getElementById('profileName').textContent = `${profile.firstName} ${profile.lastName}`;
         document.getElementById('email').value = profile.email;
-        document.getElementById('profileBio').value = profile.bio;
-        document.getElementById('profileMemberSince').textContent = `Member since ${profile.memberSince}`;
+        document.getElementById('fullName').value = `${profile.firstName} ${profile.lastName}`;
+        document.getElementById('profileBio').value = profile.bio || defaultProfile.bio;
+        
+        // Format date for display
+        const memberSince = new Date(profile.registerDate).toLocaleDateString('en-US', {
+            month: 'long',
+            year: 'numeric'
+        });
+        document.getElementById('profileMemberSince').textContent = `Member since ${memberSince}`;
         
         // Set checkboxes for interests
-        profile.interests.forEach(interest => {
+        const interests = profile.interests || defaultProfile.interests;
+        interests.forEach(interest => {
             const checkbox = document.getElementById(`interest-${interest}`);
             if (checkbox) checkbox.checked = true;
         });
         
         // Set notification preferences
-        document.getElementById('emailNotifications').checked = profile.emailNotifications;
-        document.getElementById('newsUpdates').checked = profile.newsUpdates;
+        document.getElementById('emailNotifications').checked = profile.emailNotifications ?? defaultProfile.emailNotifications;
+        document.getElementById('newsUpdates').checked = profile.newsUpdates ?? defaultProfile.newsUpdates;
     } catch (e) {
         console.error('Error loading profile:', e);
         showToast('Error loading profile');
