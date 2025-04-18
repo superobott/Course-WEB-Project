@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 date: 'April 15, 2025',
                 events: 15,
                 lastModified: '2 days ago',
-                id: 'planes'
+                id: '1'
             }
         ]
     };
@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a href="results.html?type=search&query=${encodeURIComponent(search.query)}&returnTo=profile" 
                            class="text-[#006A71] hover:underline view-results-btn">View Results</a>
                         <button class="text-red-500 hover:text-red-700 delete-btn" onclick="deleteSearchHistory('${search.id}')">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
@@ -74,20 +74,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function updateSavedTimelines() {
         const container = document.querySelector('#saved-timelines-content .space-y-4');
-        container.innerHTML = profile.savedTimelines.map(timeline => `
-            <div class="history-item p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow" data-id="${timeline.id}">
+        container.innerHTML = profile.savedTimelines.map(item => {
+            console.log('Item title:', item.title); // Changed to show exact title
+            return `
+            <div class="history-item p-4 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow" data-id="${item.id}">
                 <div class="flex justify-between items-start">
                     <div class="flex-grow">
-                        <h4 class="font-medium text-lg mb-1">${timeline.title}</h4>
-                        <p class="text-sm text-gray-600 mb-2">Saved on ${timeline.date}</p>
-                        <p class="text-sm text-gray-700">Contains ${timeline.events} events • Last modified ${timeline.lastModified}</p>
+                        <h4 class="font-medium text-lg mb-1">${item.title}</h4>
+                        <p class="text-sm text-gray-600 mb-2">Saved on ${item.date}</p>
+                        <p class="text-sm text-gray-700">Contains ${item.events} events • Last modified ${item.lastModified}</p>
                     </div>
                     <div class="flex gap-3 items-center">
-                        <a href="results.html?type=search&query=planes" 
-                           class="text-[#006A71] hover:text-[#48A6A7] transition-colors flex items-center gap-2 saved-timeline-view">
-                            <span>View</span>
-                        </a>
-                        <button class="text-red-500 hover:text-red-700 delete-btn" onclick="deleteTimeline('${timeline.id}')">
+                        <a href="results.html?query=${item.title}&returnTo=profile" 
+                           class="text-[#006A71] hover:underline view-results-btn">View Results</a>
+                        <button class="text-red-500 hover:text-red-700 delete-btn" onclick="deleteTimeline('${item.id}')">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
             </div>
-        `).join('');
+        `}).join('');
     }
 
     // Handle form submission
