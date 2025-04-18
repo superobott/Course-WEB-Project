@@ -21,6 +21,8 @@
   
   <!-- External CSS -->
   <link rel="stylesheet" href="/HistoryFlow/src/styles/login.css">
+  <!-- Login Script -->
+  <script src="/HistoryFlow/src/logic/login.js"></script>
 </head>
 <body>
   <!-- Header Section -->
@@ -114,23 +116,6 @@
         <!-- Success/Error Message Banner -->
         <div id="messageBanner" class="alert-box hidden" role="alert"></div>
         
-        <!-- Social Login -->
-        <div class="social-login">
-          <div class="divider">
-            <span class="divider-text">Or login with</span>
-          </div>
-          <div class="social-buttons">
-            <button type="button" class="social-button" aria-label="Login with Google">
-              <span class="social-icon">G</span>
-              Google
-            </button>
-            <button type="button" class="social-button" aria-label="Login with GitHub">
-              <span class="social-icon">GH</span>
-              GitHub
-            </button>
-          </div>
-        </div>
-        
         <!-- Register Link -->
         <div class="login-link-container">
           <a href="register.html" class="login-link" aria-label="Go to registration page">
@@ -145,24 +130,7 @@
   <footer class="footer">
     <div class="container text-center">
       <p>&copy; 2025 HistoryFlow. All rights reserved.</p>
-      <div class="footer-links">
-        <a href="/terms.html" class="footer-link">Terms</a>
-        <a href="/privacy.html" class="footer-link">Privacy</a>
-        <a href="/contact.html" class="footer-link">Contact</a>
-      </div>
     </div>
   </footer>
-
-  <!-- Cookie Consent Banner -->
-  <div id="cookieConsent" class="cookie-banner hidden">
-    <p>We use cookies to enhance your experience. By continuing to visit this site, you agree to our use of cookies.</p>
-    <div class="cookie-buttons">
-      <button id="acceptCookies" class="cookie-btn accept">Accept</button>
-      <button id="rejectCookies" class="cookie-btn reject">Reject</button>
-    </div>
-  </div>
-
-  <!-- Login Script -->
-  <script src="login.js"></script>
 </body>
 </html>
