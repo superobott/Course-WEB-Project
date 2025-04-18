@@ -25,13 +25,13 @@ function generateTimelineLines() {
         // If it's a decade year (divisible by 10), create medium line
         if (year % 10 === 0) {
             line.className = 'line bg-[#48A6A7] h-8 w-[2px]';
-            line.style.zhome = '5';
+            line.style.zIndex = '5';
         }
         
         // If it's a century year (divisible by 100), create big line
         if (year % 100 === 0) {
             line.className = 'line bg-[#006A71] h-16 w-1';
-            line.style.zhome = '10';
+            line.style.zIndex = '10';
         }
         
         lineWrapper.appendChild(line);
