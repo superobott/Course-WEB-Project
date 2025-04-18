@@ -2,7 +2,7 @@
 /**
  * HistoryFlow Login Page JavaScript
  * Enhanced for security, accessibility and user experience
- * @version 1.0.2
+ * @version 1.0.3
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -15,22 +15,16 @@ document.addEventListener("DOMContentLoaded", () => {
   const errorContainer = document.getElementById("errorContainer");
   const messageBanner = document.getElementById("messageBanner");
   const rateLimitNotice = document.getElementById("rateLimitNotice");
-  const cookieConsent = document.getElementById("cookieConsent");
-  const acceptCookiesButton = document.getElementById("acceptCookies");
-  const rejectCookiesButton = document.getElementById("rejectCookies");
   
   // Generate and set CSRF token
   const csrfToken = generateCSRFToken();
   document.getElementById("csrfToken").value = csrfToken;
   
-  // Login attempts counter for rate limiting demo
+  // Login attempts counter for rate limiting
   let loginAttempts = 0;
   const MAX_LOGIN_ATTEMPTS = 3;
   let cooldownTimer = 30;
   let cooldownInterval;
-  
-  // Initialize cookie consent banner
-  initCookieConsent();
   
   // Toggle password visibility
   togglePasswordButton.addEventListener("click", () => {
@@ -89,20 +83,18 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
     
-    // Get users from localStorage (in a real app, this would be a server request)
+    // Get users from localStorage and verify credentials
     const users = JSON.parse(localStorage.getItem("users")) || [];
     const user = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
     
-    // Simulate server request with a timeout
-    setTimeout(() => {
-      if (user) {
-        // Success path
-        handleSuccessfulLogin(user);
-      } else {
-        // Failed login path
-        handleFailedLogin();
-      }
-    }, 1500);
+    // Handle authentication result
+    if (user) {
+      // Success - store session and redirect to home
+      handleSuccessfulLogin(user);
+    } else {
+      // Failed login 
+      handleFailedLogin();
+    }
   });
   
   /**
@@ -143,24 +135,13 @@ document.addEventListener("DOMContentLoaded", () => {
    * @param {Object} user - The user data
    */
   function handleSuccessfulLogin(user) {
-    setLoadingState(false);
-    
     // Reset login attempts
     loginAttempts = 0;
     
-    // Show success message
-    showSuccess("Login successful! Redirecting to dashboard...");
-    
-    // In a real app, we would:
-    // 1. Receive a JWT or session token from the server
-    // 2. Store it in localStorage or secure cookie
-    // 3. Set up authentication headers for future API requests
-    
-    // Create a mock session token and store it
+    // Create a session token and store user info
     const sessionToken = generateSessionToken(user.email);
     localStorage.setItem("sessionToken", sessionToken);
     localStorage.setItem("currentUser", JSON.stringify({
-      name: user.name,
       email: user.email,
       lastLogin: new Date().toISOString()
     }));
@@ -168,10 +149,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Log the event (in production, send to analytics)
     logEvent("login_success", { email: user.email });
     
-    // Redirect to dashboard
-    setTimeout(() => {
-      window.location.href = "dashboard.html";
-    }, 1500);
+    // Redirect to home page
+    window.location.href = "home.html";
   }
   
   /**
@@ -210,7 +189,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const errorElement = document.getElementById(`${field.id}Error`);
     if (errorElement) {
       errorElement.textContent = message;
-      errorElement.classList.remove("hidden");
+      errorElement.hidden = false;
     }
   }
   
@@ -221,7 +200,6 @@ document.addEventListener("DOMContentLoaded", () => {
   function showError(message) {
     errorContainer.textContent = message;
     errorContainer.classList.remove("hidden");
-    errorContainer.classList.add("error-message");
   }
   
   /**
@@ -246,7 +224,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const errorElement = document.getElementById(`${field.id}Error`);
       if (errorElement) {
         errorElement.textContent = "";
-        errorElement.classList.add("hidden");
+        errorElement.hidden = true;
       }
     });
     
@@ -331,39 +309,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   
   /**
-   * Initializes the cookie consent banner
-   */
-  function initCookieConsent() {
-    // Check if user has already made a choice
-    const cookieChoice = localStorage.getItem("cookieConsent");
-    if (cookieChoice) {
-      cookieConsent.classList.add("hidden");
-      return;
-    }
-    
-    // Show the banner
-    cookieConsent.classList.remove("hidden");
-    
-    // Accept cookies
-    acceptCookiesButton.addEventListener("click", () => {
-      localStorage.setItem("cookieConsent", "accepted");
-      cookieConsent.classList.add("hidden");
-    });
-    
-    // Reject cookies
-    rejectCookiesButton.addEventListener("click", () => {
-      localStorage.setItem("cookieConsent", "rejected");
-      cookieConsent.classList.add("hidden");
-    });
-  }
-  
-  /**
-   * Validates email format
+   * Validates email format using regex
    * @param {string} email - The email to validate
    * @returns {boolean} Whether the email is valid
    */
   function validateEmail(email) {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$/i.test(email);
   }
   
   /**
