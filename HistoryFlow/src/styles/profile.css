@@ -2,11 +2,11 @@
 .base-button {
     display: inline-block;
     background-color: #006A71;
-    color: #F2EFE7;
+    color: white;
     font-weight: 600;
-    padding: 0.75rem 1.5rem;
+    padding: 0.5rem 1rem;
     border-radius: 0.5rem;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s;
     border: 2px solid #006A71;
     box-shadow: 0 4px 6px rgba(0, 106, 113, 0.2);
     text-decoration: none;
@@ -14,7 +14,7 @@
 }
 
 .base-button:hover {
-    background-color: #F2EFE7;
+    background-color: #48A6A7;
     color: #006A71;
     transform: translateY(-2px);
     box-shadow: 0 6px 8px rgba(0, 106, 113, 0.3);
@@ -28,9 +28,10 @@
 /* Profile Card Styles */
 .profile-card {
     background-color: white;
-    border-radius: 0.75rem;
-    box-shadow: 0 4px 12px rgba(0, 106, 113, 0.15);
-    transition: transform 0.3s ease;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 106, 113, 0.1);
 }
 
 .profile-card:hover {
@@ -58,6 +59,7 @@
     overflow: hidden;
     cursor: pointer;
     transition: color 0.2s ease;
+    color: #006A71;
 }
 
 .tab-button:hover {
@@ -66,7 +68,8 @@
 
 .tab-button.active {
     color: #006A71;
-    font-weight: 600;
+    font-weight: bold;
+    border-bottom: 2px solid #006A71;
 }
 
 .tab-button.active::after {
@@ -122,16 +125,20 @@ input:focus, textarea:focus {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
+    background-color: rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.3s;
 }
 
 .modal-content {
-    background-color: #fff;
+    background: linear-gradient(to bottom right, #ffffff, #f8f9fa);
+    border-radius: 1rem;
+    border: 1px solid rgba(0, 106, 113, 0.2);
     margin: 5% auto;
     padding: 20px;
     width: 90%;
     max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     animation: slideIn 0.3s;
 }
@@ -154,6 +161,10 @@ input:focus, textarea:focus {
     font-weight: bold;
     cursor: pointer;
     transition: color 0.2s;
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    font-size: 1.5rem;
 }
 
 .close:hover,
@@ -336,25 +347,26 @@ input:focus, textarea:focus {
 /* Toast Notification Styles */
 .toast-notification {
     position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background-color: #006A71;
+    bottom: 2rem;
+    right: 2rem;
+    background-color: #48A6A7;
     color: white;
-    padding: 12px 20px;
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    padding: 1rem 2rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     z-index: 2000;
     display: flex;
     align-items: center;
     opacity: 0;
     transition: opacity 0.3s, transform 0.3s;
     pointer-events: none;
+    transform: translateY(150%);
+    transition: transform 0.3s ease-in-out;
 }
 
 .toast-notification.show {
     opacity: 1;
-    transform: translateX(-50%) translateY(-10px);
+    transform: translateY(0);
     pointer-events: auto;
 }
 

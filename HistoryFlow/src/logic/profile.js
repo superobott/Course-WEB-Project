@@ -28,6 +28,27 @@ document.addEventListener('DOMContentLoaded', () => {
     let profile = JSON.parse(localStorage.getItem('userProfile')) || defaultProfile;
     localStorage.setItem('userProfile', JSON.stringify(profile));
 
+    // Global variables
+    let currentItemToDelete = null;
+    let currentDeleteCallback = null;
+
+    // DOM Elements
+    const editProfileModal = document.getElementById('editProfileModal');
+    const editProfileBtn = document.getElementById('editProfileBtn');
+    const cancelEditBtn = document.getElementById('cancelEditBtn');
+    const closeBtn = editProfileModal.querySelector('.close');
+    const editProfileForm = document.getElementById('editProfileForm');
+    const chooseImageBtn = document.getElementById('chooseImageBtn');
+    const profileImageInput = document.getElementById('profileImageInput');
+    const deleteConfirmation = document.getElementById('deleteConfirmation');
+    const deleteItemTitle = document.getElementById('deleteItemTitle');
+    const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    const toastNotification = document.getElementById('toastNotification');
+    const toastMessage = document.getElementById('toastMessage');
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
     // Update UI with profile data
     function updateProfileUI() {
         document.getElementById('profileName').textContent = profile.fullName;
@@ -120,14 +141,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delete handlers
     window.deleteSearchHistory = (id) => {
         profile.searchHistory = profile.searchHistory.filter(item => item.id !== id);
-        localStorage.setItem('userProfile', JSON.stringify(profile));
+        localStorage.setItem('users', JSON.stringify(profile));
         updateSearchHistory();
         showToast('Search history item deleted');
     };
 
     window.deleteTimeline = (id) => {
         profile.savedTimelines = profile.savedTimelines.filter(item => item.id !== id);
-        localStorage.setItem('userProfile', JSON.stringify(profile));
+        localStorage.setItem('users', JSON.stringify(profile));
         updateSavedTimelines();
         showToast('Timeline deleted');
     };
@@ -225,14 +246,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handleProfileUpdate(e) {
         e.preventDefault();
-        // Update profile logic here
+        const formData = new FormData(e.target);
+        
+        profile.fullName = formData.get('fullName');
+        profile.bio = formData.get('bio') || '';
+        profile.interests = [...formData.getAll('interests[]')];
+        
+        localStorage.setItem('userProfile', JSON.stringify(profile));
+        updateProfileUI();
+        
         editProfileModal.style.display = 'none';
         showToast('Profile updated successfully');
     }
 
     function handleSettingsUpdate(e) {
         e.preventDefault();
-        // Update settings logic here
+        const formData = new FormData(e.target);
+        
+        profile.email = formData.get('email');
+        
+        localStorage.setItem('userProfile', JSON.stringify(profile));
+        updateProfileUI();
+        
         showToast('Settings updated successfully');
     }
 
