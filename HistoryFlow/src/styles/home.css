@@ -26,7 +26,7 @@
     box-shadow: 0 2px 4px rgba(0, 106, 113, 0.2);
 }
 
-/* Combined timeline track styles */
+/* Timeline specific styles */
 .timeline-track {
     scroll-behavior: smooth;
     overflow-x: scroll;
@@ -50,7 +50,7 @@
     margin: 0 8px;
 }
 
-/* Base tooltip styles */
+/* Tooltip styles */
 .line::before,
 .line::after {
     position: absolute;
