@@ -1,16 +1,80 @@
 document.addEventListener('DOMContentLoaded', function () {
     const urlParams = new URLSearchParams(window.location.search);
-    const searchQuery = urlParams.get('query'); // Get the search query from URL
+    const queryType = urlParams.get('type');
+    const searchQuery = urlParams.get('query');
+    const year = urlParams.get('year');
 
-    // Show a message based on the search query
     const searchInfo = document.getElementById('searchInfo');
-    searchInfo.textContent = `Search results for: "${searchQuery}"`;
-
-    // If the search query matches 'planes', load and display data
-    if (searchQuery.toLowerCase() === 'planes') {
-        loadTimelineData('data/planesData.json');
+    
+    if (queryType === 'search') {
+        searchInfo.textContent = `Search results for: "${searchQuery}"`;
+        // Load all data and filter it
+        loadAndFilterData(searchQuery, 'search');
+    } else if (queryType === 'timeline') {
+        searchInfo.textContent = `Historical events from year: ${year}`;
+        loadAndFilterData(year, 'timeline');
     }
 });
+
+function loadAndFilterData(query, type) {
+    fetch('data/combinedData.json')
+        .then(res => res.json())
+        .then(data => {
+            const filteredData = filterTimelineData(data, query, type);
+            
+            if (Object.keys(filteredData.timeline).length > 0) {
+                displayTimelineData(filteredData);
+            } else {
+                showNoResults(`No results found for: "${query}"`);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading JSON data:', error);
+            showNoResults('Error loading data. Please try again.');
+        });
+}
+
+function filterTimelineData(data, query, type) {
+    const filteredData = { timeline: {} };
+    query = query.toLowerCase();
+
+    data.events.forEach(yearData => {
+        const year = yearData.year.toString();
+        
+        if (type === 'timeline') {
+            // Timeline view - exact year match
+            if (year === query) {
+                filteredData.timeline[year] = yearData.events;
+            }
+        } else {
+            // Search view - check all fields
+            const filteredEvents = yearData.events.filter(event => 
+                event.title.toLowerCase().includes(query) ||
+                event.category.toLowerCase().includes(query) ||
+                event.description.toLowerCase().includes(query)
+            );
+
+            if (filteredEvents.length > 0) {
+                filteredData.timeline[year] = filteredEvents;
+            }
+        }
+    });
+
+    return filteredData;
+}
+
+// Add this new function to handle no results
+function showNoResults(message) {
+    const resultsList = document.getElementById('resultsList');
+    const noResultsDiv = document.createElement('div');
+    noResultsDiv.classList.add('no-results');
+    noResultsDiv.style.textAlign = 'center';
+    noResultsDiv.style.padding = '2rem';
+    noResultsDiv.style.color = '#006A71';
+    noResultsDiv.textContent = message;
+    resultsList.appendChild(noResultsDiv);
+}
+
 
 // Function to fetch and load data from a JSON file
 function loadTimelineData(jsonFile) {
@@ -33,114 +97,53 @@ function loadTimelineData(jsonFile) {
 // Function to display the timeline data
 function displayTimelineData(data) {
     const resultsList = document.getElementById('resultsList');
+    resultsList.innerHTML = '';
 
-    // Create the wrapper for the vertical timeline
     const timelineWrapper = document.createElement('div');
     timelineWrapper.classList.add('timeline-wrapper');
-    timelineWrapper.style.position = 'relative';
-    timelineWrapper.style.padding = '20px';
 
-    // Create the timeline container (vertical line)
     const timelineContainer = document.createElement('div');
     timelineContainer.classList.add('timeline-container');
-    timelineContainer.style.position = 'relative';
-    timelineContainer.style.display = 'flex';
-    timelineContainer.style.flexDirection = 'column';
-    timelineContainer.style.alignItems = 'center';
 
-    // Create the timeline line
     const timelineLine = document.createElement('div');
     timelineLine.classList.add('timeline-line');
-    timelineLine.style.position = 'absolute';
-    timelineLine.style.left = '50%';
-    timelineLine.style.top = '0';
-    timelineLine.style.height = '100%';
-    timelineLine.style.width = '2px';
-    timelineLine.style.backgroundColor = '#006A71';
     timelineContainer.appendChild(timelineLine);
 
-    // Sort years in ascending order
     const years = Object.keys(data.timeline).sort((a, b) => a - b);
 
-    // Define the scale for year spacing
-    const yearSpacing = 120; // Space between each year (adjust for layout)
-
-    years.forEach((year, index) => {
+    years.forEach(year => {
         const yearData = data.timeline[year];
-
-        // Create a container for this year's events
         const yearContainer = document.createElement('div');
         yearContainer.classList.add('year-container');
-        yearContainer.style.position = 'relative';
-        yearContainer.style.marginTop = `${index * yearSpacing}px`;
 
-        // Create the year marker
         const yearMarker = document.createElement('div');
         yearMarker.classList.add('year-marker');
         yearMarker.textContent = year;
-        yearMarker.style.textAlign = 'center';
-        yearMarker.style.fontWeight = 'bold';
-        yearMarker.style.padding = '10px';
         yearContainer.appendChild(yearMarker);
 
-        // Create a list for events in this year
         const eventsList = document.createElement('ul');
         eventsList.classList.add('events-list');
 
-        // Create each event under this year
-        yearData.forEach((event, eventIndex) => {
+        yearData.forEach(event => {
             const eventItem = document.createElement('li');
             eventItem.classList.add('event-item');
-            eventItem.style.position = 'relative';
 
-            // Alternate the events left and right of the timeline
-            const isLeft = eventIndex % 2 === 0;
-            eventItem.style.left = isLeft ? '-200px' : '200px'; // Move events to the left or right
-
-            // Create the event box
             const eventBox = document.createElement('div');
             eventBox.classList.add('event-box');
-            eventBox.style.backgroundColor = '#F2EFE7';
-            eventBox.style.border = '1px solid #006A71';
-            eventBox.style.padding = '10px';
-            eventBox.style.borderRadius = '8px';
-            eventBox.style.width = '200px';
+            eventBox.innerHTML = `
+                <h4 class="font-semibold">${event.title}</h4>
+                <p class="text-sm text-[#9ACBD0]">Category: ${event.category}</p>
+                <p class="text-gray-600">${event.description}</p>
+            `;
 
-            // Event title
-            const eventTitle = document.createElement('h4');
-            eventTitle.classList.add('font-semibold');
-            eventTitle.textContent = event.title;
-            eventBox.appendChild(eventTitle);
-
-            // Event category
-            const eventCategory = document.createElement('p');
-            eventCategory.classList.add('text-sm', 'text-[#9ACBD0]');
-            eventCategory.textContent = `Category: ${event.category}`;
-            eventBox.appendChild(eventCategory);
-
-            // Event description
-            const eventDescription = document.createElement('p');
-            eventDescription.classList.add('text-gray-600');
-            eventDescription.textContent = event.description;
-            eventBox.appendChild(eventDescription);
-
-            // Append the event box to the event item
             eventItem.appendChild(eventBox);
-
-            // Append the event item to the events list
             eventsList.appendChild(eventItem);
         });
 
-        // Append the events list to the year container
         yearContainer.appendChild(eventsList);
-
-        // Append the year container to the timeline container
         timelineContainer.appendChild(yearContainer);
     });
 
-    // Append the timeline container to the wrapper
     timelineWrapper.appendChild(timelineContainer);
-
-    // Append the timeline wrapper to the results list
     resultsList.appendChild(timelineWrapper);
 }

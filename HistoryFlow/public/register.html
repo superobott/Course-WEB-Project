@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Join HistoryFlow to explore historical events and timelines. Create your account today.">
+    
+    <!-- Open Graph / Social Media Tags -->
+    <meta property="og:title" content="HistoryFlow - Create Your Account">
+    <meta property="og:description" content="Join HistoryFlow to explore historical events and create your own custom timelines.">
+    <meta property="og:image" content="/HistoryFlow/assets/images/historyflow-preview.jpg">
+    <meta property="og:url" content="historyflow.example.com/register.html">
+    <meta property="og:type" content="website">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';" />
+    
+    <title>HistoryFlow - Register</title>
+    
+    <!-- Main stylesheet -->
+    <link rel="stylesheet" href="/HistoryFlow/src/styles/register.css">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="header">
+        <div class="container text-center">
+            <div class="logo-container">
+                <img src="/HistoryFlow/assets/images/logo-blue.png" alt="HistoryFlow Logo" width="150" height="50" 
+                     class="logo" loading="lazy">
+            </div>
+            <h1 class="header-title">Register for HistoryFlow</h1>
+            <p class="header-subtitle">Join us to explore historical events and timelines.</p>
+        </div>
+    </header>
+
+    <!-- Registration Form -->
+    <main class="main-content">
+        <section class="form-section">
+            <div class="container card">
+                <h2 class="form-title">Create an Account</h2>
+                
+                <!-- Success message (hidden by default) -->
+                <div id="successMessage" class="success-message" role="status" aria-live="polite" hidden>
+                    <div class="success-icon">✓</div>
+                    <p>Registration successful! Redirecting to login page...</p>
+                    <div class="loader"></div>
+                </div>
+                
+                <form id="registerForm" class="form-container" action="/api/register" method="POST" novalidate>
+                    <!-- CSRF Token (hidden) -->
+                    <input type="hidden" id="csrfToken" name="csrfToken" value="">
+                    
+                    <!-- Honeypot field (hidden) -->
+                    <div class="honeypot-field">
+                        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                    </div>
+
+                    <!-- Full Name Fields -->
+                    <div class="form-group">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input 
+                            type="text" 
+                            id="firstName"
+                            name="firstName" 
+                            placeholder="Enter your first name" 
+                            class="form-input" 
+                            required
+                            autocomplete="given-name"
+                            aria-describedby="firstNameError"
+                        >
+                        <div id="firstNameError" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName"
+                            name="lastName" 
+                            placeholder="Enter your last name" 
+                            class="form-input" 
+                            required
+                            autocomplete="family-name"
+                            aria-describedby="lastNameError"
+                        >
+                        <div id="lastNameError" class="error-message" role="alert" hidden></div>
+                    </div>
+                    
+                    <!-- Email field -->
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email"
+                            name="email" 
+                            placeholder="your@email.com" 
+                            class="form-input" 
+                            required
+                            autocomplete="email"
+                            aria-describedby="emailError"
+                        >
+                        <div id="emailError" class="error-message" role="alert" hidden></div>
+                    </div>
+                    
+                    <!-- Password field -->
+                    <div class="form-group">
+                        <label for="password" class="form-label">Password</label>
+                        <div class="password-container">
+                            <input 
+                                type="password"
+                                id="password" 
+                                name="password" 
+                                placeholder="Create a password" 
+                                class="form-input" 
+                                required
+                                minlength="8"
+                                autocomplete="new-password"
+                                aria-describedby="passwordRequirements passwordStrength passwordError"
+                            >
+                            <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div id="passwordStrength" class="password-strength">
+                            <div class="strength-meter">
+                                <div class="strength-meter-fill" data-strength="0"></div>
+                            </div>
+                            <span class="strength-text">Password strength: Too weak</span>
+                        </div>
+                        <div id="passwordRequirements" class="input-requirements">
+                            Min 8 characters with uppercase, lowercase, number and symbol
+                        </div>
+                        <div id="passwordError" class="error-message" role="alert" hidden></div>
+                    </div>
+                    
+                    <!-- Confirm Password field -->
+                    <div class="form-group">
+                        <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        <div class="password-container">
+                            <input 
+                                type="password"
+                                id="confirmPassword" 
+                                name="confirmPassword" 
+                                placeholder="Confirm your password" 
+                                class="form-input" 
+                                required
+                                autocomplete="new-password"
+                                aria-describedby="confirmPasswordError"
+                            >
+                            <button type="button" id="toggleConfirmPassword" class="password-toggle" aria-label="Show password">
+                                <span class="eye-icon">👁️</span>
+                            </button>
+                        </div>
+                        <div id="confirmPasswordError" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <!-- Security Question Fields -->
+                    <div class="form-group">
+                        <label for="securityQuestion" class="form-label">Security Question</label>
+                        <select
+                            id="securityQuestion"
+                            name="securityQuestion"
+                            class="form-input"
+                            required
+                            aria-describedby="securityQuestionError"
+                        >
+                            <option value="">Select a security question</option>
+                            <option value="pet">What was your first pet's name?</option>
+                            <option value="city">In which city were you born?</option>
+                            <option value="school">What was the name of your first school?</option>
+                        </select>
+                        <div id="securityQuestionError" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="securityAnswer" class="form-label">Security Answer</label>
+                        <input
+                            type="text"
+                            id="securityAnswer"
+                            name="securityAnswer"
+                            class="form-input"
+                            required
+                            placeholder="Enter your answer"
+                            aria-describedby="securityAnswerError"
+                        >
+                        <div id="securityAnswerError" class="error-message" role="alert" hidden></div>
+                    </div>
+                    
+                    <!-- GDPR Consent -->
+                    <div class="form-group checkbox-group">
+                        <div class="checkbox-container">
+                            <input type="checkbox" id="gdprConsent" name="gdprConsent" required>
+                            <label for="gdprConsent" class="checkbox-label">
+                                I consent to HistoryFlow storing and processing my personal data
+                            </label>
+                        </div>
+                        <div id="gdprConsentError" class="error-message" role="alert" hidden></div>
+                    </div>
+                    
+                    <!-- Enhanced CAPTCHA with math challenge -->
+                    <div class="form-group captcha-container">
+                        <div id="captcha" class="captcha-placeholder">
+                            <div class="mock-captcha" id="mockCaptcha">
+                                <div class="mock-captcha-checkbox" id="captchaCheckbox"></div>
+                                <span>I'm not a robot</span>
+                            </div>
+                            
+                            <!-- Math challenge (hidden by default) -->
+                            <div class="captcha-challenge" id="captchaChallenge">
+                                <div class="captcha-challenge-text">Please solve this math problem to verify you're human:</div>
+                                <div class="captcha-math-problem" id="mathProblem"></div>
+                                <input type="text" id="captchaInput" class="captcha-input" placeholder="Enter answer" aria-label="Captcha answer">
+                                <button type="button" id="verifyCaptchaBtn" class="captcha-button">Verify</button>
+                                <div class="captcha-error" id="captchaError">Incorrect answer, please try again.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Global error message container -->
+                    <div id="errorContainer" class="error-container" role="alert" aria-live="assertive"></div>
+                    
+                    <!-- Submit button -->
+                    <div class="button-container">
+                        <button 
+                            type="submit" 
+                            id="registerButton"
+                            aria-label="Register account"
+                            class="btn btn-primary">
+                            <span>Register</span>
+                            <div class="button-loader" hidden></div>
+                        </button>
+                    </div>
+                </form>
+                
+                <div class="login-link-container">
+                    <a href="login.html" class="login-link" aria-label="Go to login page">
+                        Already have an account? Log in
+                    </a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer Section -->
+    <footer class="footer">
+        <div class="container text-center">
+            <p>&copy; 2025 HistoryFlow. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="/terms.html">Terms</a>
+                <a href="/privacy.html">Privacy</a>
+                <a href="/contact.html">Contact</a>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- JSON-LD Structured Data for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "schema.org",
+        "@type": "WebSite",
+        "name": "HistoryFlow",
+        "url": "historyflow.example.com",
+        "description": "Interactive historical timelines and events exploration"
+    }
+    </script>
+    
+    <!-- Main registration script -->
+    <script src="/HistoryFlow/src/logic/register.js" defer></script>
+</body>
+</html>

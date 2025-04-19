@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Timeline History - Home Search</title>
+    <link rel="stylesheet" href="/HistoryFlow/src/output.css">  
+    <link rel="stylesheet" href="/HistoryFlow/src/styles/home.css">  
+    <script src="../src/logic/home.js"></script>
+</head>
+<body class="bg-[#F2EFE7] text-[#006A71] min-h-screen flex flex-col">
+    <!-- Header Section -->
+    <header class="bg-[#006A71] text-[#F2EFE7] py-6">
+        <div class="container mx-auto text-center relative">
+            <!-- Profile Logo Button -->
+            <button class="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-[#48A6A7] rounded-full transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </button>
+            <h1 class="text-4xl font-bold">Welcome to HistoryFlow</h1>
+            <p class="text-lg mt-2">Discover historical events, timelines, and more!</p>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-[#F2EFE7] py-12">
+        <div class="container mx-auto text-center">
+            <h2 class="text-3xl font-semibold mb-4">Search for Historical Timelines</h2>
+            <p class="text-gray-600 mb-6">Enter keywords to explore events and timelines from history.</p>
+            <form id="searchForm" class="flex justify-center items-center gap-4" action="results.html" method="GET">
+                <input 
+                    type="text" 
+                    id="searchInput" 
+                    name="searchInput" 
+                    placeholder="Enter keywords..." 
+                    class="w-1/2 px-4 py-2 border border-[#9ACBD0] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#48A6A7]"
+                    required
+                >
+                <button 
+                    type="submit" 
+                    class="base-button">
+                    Search
+                </button>
+            </form>
+        </div>
+    </section>
+
+        <!-- Timeline Section -->
+    <section id="timelineSection" class="bg-[#F2EFE7] py-12">
+        <div class="container mx-auto">
+            <h2 class="text-2xl font-semibold text-center mb-6">Explore the Timeline</h2>
+            <div class="timeline-roller flex items-center justify-center gap-4">
+                <button 
+                    class="base-button scroll-btn" 
+                    id="scrollLeft">
+                    &lt;
+                </button>
+                <!-- Removed the onclick attribute from the timeline track -->
+                <div class="timeline-track w-full h-28 rounded-lg flex items-center justify-start overflow-hidden" 
+                    style="padding: 0 10px;" 
+                    id="timelineTrack">
+                    <!-- Lines will be generated here -->
+                </div>
+                <button 
+                    class="base-button scroll-btn" 
+                    id="scrollRight">
+                    &gt;
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="bg-[#006A71] text-[#F2EFE7] py-4 mt-auto">
+        <div class="container mx-auto text-center">
+            <p>&copy; 2025 Timeline History Website. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
