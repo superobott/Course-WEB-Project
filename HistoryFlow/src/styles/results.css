@@ -93,3 +93,10 @@
 .scroll-right {
     right: 10px;
 }
+
+/* No results container */
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #006A71;
+}
