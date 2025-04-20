@@ -190,6 +190,43 @@
                         <div id="securityAnswerError" class="error-message" role="alert" hidden></div>
                     </div>
                     
+                    <!-- Bio field (Optional) -->
+                    <div class="form-group">
+                        <label for="profileBio" class="form-label">
+                            Bio <span class="optional-label">(Optional)</span>
+                        </label>
+                        <textarea 
+                            id="profileBio" 
+                            name="profileBio" 
+                            class="form-input" 
+                            rows="4" 
+                            placeholder="Tell us about yourself..."
+                            aria-describedby="profileBioError"
+                        ></textarea>
+                        <div id="profileBioError" class="error-message" role="alert" hidden></div>
+                    </div>
+                    
+                    <!-- Interests field (Optional) -->
+                    <div class="form-group">
+                        <label class="form-label">
+                            Interests <span class="optional-label">(Optional)</span>
+                        </label>
+                        <div class="interests-container">
+                            <div class="interest-checkbox">
+                                <input type="checkbox" id="interest-History" name="interests[]" value="History">
+                                <label for="interest-History" class="checkbox-label">History</label>
+                            </div>
+                            <div class="interest-checkbox">
+                                <input type="checkbox" id="interest-Art" name="interests[]" value="Art">
+                                <label for="interest-Art" class="checkbox-label">Art</label>
+                            </div>
+                            <div class="interest-checkbox">
+                                <input type="checkbox" id="interest-Science" name="interests[]" value="Science">
+                                <label for="interest-Science" class="checkbox-label">Science</label>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- GDPR Consent -->
                     <div class="form-group checkbox-group">
                         <div class="checkbox-container">

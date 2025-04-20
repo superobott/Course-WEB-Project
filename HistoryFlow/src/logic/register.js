@@ -1,7 +1,7 @@
 /**
  * HistoryFlow Registration Page JavaScript
  * Enhanced for accessibility, security, and UX
- * @version 1.0.6
+ * @version 1.0.7
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -33,6 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
     const errorContainer = document.getElementById('errorContainer');
     const successMessage = document.getElementById('successMessage');
+    
+    // New optional profile fields
+    const profileBioInput = document.getElementById('profileBio');
+    const interestCheckboxes = document.querySelectorAll('input[name="interests[]"]');
     
     // CAPTCHA elements
     const mockCaptcha = document.getElementById('mockCaptcha');
@@ -102,6 +106,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastName = lastNameInput.value.trim();
         const email = emailInput.value.trim();
         
+        // Get bio if provided
+        const bio = profileBioInput ? profileBioInput.value.trim() : '';
+        
+        // Get selected interests
+        const interests = [];
+        interestCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                interests.push(checkbox.value);
+            }
+        });
+        
         // Get existing users or initialize empty array
         let users = [];
         try {
@@ -134,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
             registerDate: new Date().toISOString(),
             gdprConsent: gdprConsentCheckbox.checked,
             id: generateUserId(),
-            bio: '',
-            interests: [],
+            bio: bio || '',
+            interests: interests || [],
             searchHistory: [],
             savedTimelines: [],
             profileImage: null
@@ -144,11 +159,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add new user to array
         users.push(user);
         
+        // Also set as currentUser for immediate login after registration
+        const currentUser = {...user};
+        
         // Simulate network request to server
         setTimeout(function() {
             try {
                 // Store updated users array in localStorage
                 localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
                 console.log('✅ User registered successfully');
                 
                 // Log registration success (in production, send to analytics)
@@ -369,6 +388,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showCheckboxError(gdprConsentCheckbox, 'You must consent to the data storage policy');
             isValid = false;
         }
+        
+        // Note: We don't validate bio and interests since they're optional
         
         return isValid;
     }
