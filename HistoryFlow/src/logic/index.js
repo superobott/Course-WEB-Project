@@ -1,8 +1,7 @@
-// login.js
 /**
  * HistoryFlow Login Page JavaScript
  * Enhanced for security, accessibility and user experience
- * @version 1.0.3
+ * @version 1.0.4
  */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -138,11 +137,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Reset login attempts
     loginAttempts = 0;
     
-    // Create a session token and store user info
+    // Create a session token and store full user info
     const sessionToken = generateSessionToken(user.email);
     localStorage.setItem("sessionToken", sessionToken);
     localStorage.setItem("currentUser", JSON.stringify({
-      email: user.email,
+      ...user,
       lastLogin: new Date().toISOString()
     }));
     

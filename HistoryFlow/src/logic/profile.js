@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!currentUser || !currentUser.email) {
             showToast('No user data found. Please log in.');
             setTimeout(() => {
-                window.location.href = 'login.html';
+                window.location.href = 'index.html';
             }, 2000);
             return null;
         }
@@ -286,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('sessionToken');
         showToast('Logged out successfully');
         setTimeout(() => {
-            window.location.href = 'login.html';
+            window.location.href = 'index.html';
         }, 2000);
     });
 
