@@ -80,6 +80,9 @@
   padding: 10px 15px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  width: 160px;         /* קובע רוחב קבוע */
+  text-align: center;   /* ממרכז את הטקסט בתוך הכפתור */
+  display: inline-block;
 }
 
 .date-button:hover {
