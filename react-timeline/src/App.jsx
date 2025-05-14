@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/searchBar';
 import TimelineEvent from './components/TimelineEvent';
-import './index.css';
+import './output.css';
 
 const extractDatesWithContext = (text) => {
   const regex = /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4}\b/g;
@@ -27,7 +27,6 @@ const extractDatesWithContext = (text) => {
   const results = [];
 
   lines.forEach(line => {
-    // דילוג על שורות עם מילים טכניות
     if (excludeKeywords.some(keyword => line.includes(keyword))) return;
 
     const match = line.match(regex);
@@ -45,7 +44,6 @@ const extractDatesWithContext = (text) => {
     }
   });
 
-  // מיון מהתאריך הכי ישן לחדש
   results.sort((a, b) => a.sortDate - b.sortDate);
 
   return results;
