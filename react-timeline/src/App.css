@@ -1,20 +1,20 @@
-/* src/App.css */
+/* App.css */
 
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f3f4f6; /* צבע רקע אפור בהיר */
+  background-color: #f3f4f6; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 .app-container {
-  min-height: 100vh; /* גובה מינימלי של כל המסך */
+  min-height: 100vh; 
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
-  box-sizing: border-box; /* כדי שה-padding לא יגרום לגלישה */
+  box-sizing: border-box; 
 }
 
 .app-title {
@@ -103,10 +103,20 @@ body {
 }
 
 .timeline-events-container {
-  position: relative;
-  border-left: 4px solid #006A71; /* קו ציר הזמן */
-  margin-left: 40px; /* מרווח מהשוליים כדי לפנות מקום למרקרים */
-  padding-left: 32px; /* מרווח פנימי לתוכן האירועים */
+  position: relative; 
+  padding: 20px; 
+}
+/* הקו המרכזי */
+.timeline-events-container::before {
+  content: ''; 
+  position: absolute; 
+  top: 0;
+  bottom: 0;
+  left: 50%; /* ממקם את הקו במרכז הקונטיינר */
+  width: 4px;
+  background-color: #006A71;
+  transform: translateX(-50%); /* מזיז את הקו חזרה בחצי מרוחבו כדי שיהיה בדיוק במרכז */
+  z-index: 0; /* וודא שהקו מאחורי האירועים */
 }
 
 .no-events-message,

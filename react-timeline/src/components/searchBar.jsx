@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import './searchBar.css'; 
 
 function SearchBar({ onSearch }) {
   const [term, setTerm] = useState('');
@@ -6,28 +7,22 @@ function SearchBar({ onSearch }) {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (term.trim()) {
-      onSearch(term); 
+      onSearch(term);
     }
   };
 
   return (
-    <form 
-      onSubmit={handleSubmit} 
-      style={{ 
-        display: 'flex', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        gap: '10px', 
-        marginTop: '10px' 
-      }}
+    <form
+      onSubmit={handleSubmit}
+      className="search-bar-form" 
     >
       <input
         type="text"
-        placeholder="enter search term"
+        placeholder="Enter search term" 
         value={term}
         onChange={(e) => setTerm(e.target.value)}
       />
-      <button type="submit">search</button>
+      <button type="submit">search</button> {}
     </form>
   );
 }

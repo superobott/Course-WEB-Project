@@ -41,27 +41,43 @@ async function generateTimelineFromGemini(text) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-      Summarize the following text in chronological order. For each year or date mentioned, describe what happened around that date. Return the result as a JSON array of objects in the following format:
+      You are an expert historian and timeline creator.
+      Please provide ONLY a JSON array of events in this exact format:
+
       [
-        { "date": "1905", "summary": "Publication of Einstein's special relativity papers" },
-        ...
+      { "date": "1905", "summary": "Detailed description" },
+      ...
       ]
+
+      Analyze the following text and extract all relevant historical events, with detailed summaries.
 
       Text:"""${text}"""`;
 
     const result = await model.generateContent(prompt);
     const rawText = result.response.text();
-
     const jsonStart = rawText.indexOf('[');
     const jsonEnd = rawText.lastIndexOf(']');
+
+    if (jsonStart === -1 || jsonEnd === -1) {
+      console.error('Could not find JSON array in Gemini response');
+      return [];
+    }
+
     const jsonText = rawText.slice(jsonStart, jsonEnd + 1);
 
-    return JSON.parse(jsonText);
+    try {
+      return JSON.parse(jsonText);
+    } catch (e) {
+      console.error('Failed to parse JSON from Gemini:', e);
+      return [];
+    }
+
   } catch (error) {
     console.error('Gemini parsing error:', error);
     return [];
   }
 }
+
 
 // --- Routes
 app.get('/search', async (req, res) => {
@@ -74,7 +90,7 @@ app.get('/search', async (req, res) => {
   try {
     const cachedData = await TimelineModel.findOne({ query: query.toLowerCase() });
     if (cachedData) {
-      console.log(`Found "${query}" in cache.`);
+      console.log(`Found "${query}" in DB.`);
       return res.json({
         extract: cachedData.fullText,
         timelineEvents: cachedData.timelineEvents,
