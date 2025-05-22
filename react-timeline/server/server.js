@@ -1,4 +1,4 @@
-require('dotenv').config(); // טוען את קובץ .env במידת הצורך
+require('dotenv').config(); 
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -13,19 +13,20 @@ const port = 4000;
 app.use(cors());
 app.use(bodyParser.json());
 
-// --- ✨ Gemini config with API key from environment variable
+//connection to GEMINI API
 if (!process.env.GEMINI_API_KEY) {
   console.error('Error: GEMINI_API_KEY is not set in .env file!');
-  process.exit(1); // עצור את התהליך אם אין מפתח API
+  process.exit(1); 
 }
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// --- DB Setup
+//connection to MongoDB
 mongoose.connect('mongodb://localhost:27017/Timeline')
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
+//create a schema for the timeline
 const timelineSchema = new mongoose.Schema({
   query: { type: String, unique: true, required: true },
   fullText: { type: String, required: true },
@@ -35,7 +36,7 @@ const timelineSchema = new mongoose.Schema({
 
 const TimelineModel = mongoose.model('Timeline', timelineSchema);
 
-// --- ✨ Gemini timeline generation function
+//Gemini timeline generation function
 async function generateTimelineFromGemini(text) {
   try {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
@@ -79,7 +80,7 @@ async function generateTimelineFromGemini(text) {
 }
 
 
-// --- Routes
+//Routes
 app.get('/search', async (req, res) => {
   const query = req.query.q;
 

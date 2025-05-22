@@ -1,8 +1,7 @@
-// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/searchBar';
 import TimelineEvent from './components/TimelineEvent';
-import './App.css'; // שיניתי את הייבוא ל-App.css במקום index.css כדי שיהיה ברור שזה ה-CSS של האפליקציה
+import './App.css'; 
 
 function App() {
   const [query, setQuery] = useState('');

@@ -1,4 +1,3 @@
-// src/components/TimelineEvent.jsx
 import React, { useState } from 'react';
 import './TimelineEvent.css';
 
