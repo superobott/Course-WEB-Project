@@ -1,110 +1,70 @@
-// server.js
+require('dotenv').config(); // טוען את קובץ .env במידת הצורך
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const fetch = require('node-fetch'); // יש לוודא שמותקן: npm install node-fetch
-
-// טעינת משתני סביבה אם יש (לדוגמה, עבור חיבור ל-DB מרוחק)
-// require('dotenv').config();
+const fetch = require('node-fetch');
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 const app = express();
 const port = 4000;
 
-// Middleware
-app.use(cors()); // מאפשר בקשות מצד הלקוח (React)
-app.use(bodyParser.json()); // מנתח בקשות עם גוף מסוג JSON
+app.use(cors());
+app.use(bodyParser.json());
 
-// חיבור ל-MongoDB
-// ודא ש-MongoDB פועל על המחשב שלך או שנה את כתובת ה-URI לכתובת של ה-DB שלך
+// --- ✨ Gemini config with API key from environment variable
+if (!process.env.GEMINI_API_KEY) {
+  console.error('Error: GEMINI_API_KEY is not set in .env file!');
+  process.exit(1); // עצור את התהליך אם אין מפתח API
+}
+
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+
+// --- DB Setup
 mongoose.connect('mongodb://localhost:27017/Timeline')
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// הגדרת סכמה עבור נתוני ציר הזמן
 const timelineSchema = new mongoose.Schema({
-  query: { type: String, unique: true, required: true }, // מונח החיפוש - מפתח ייחודי
-  fullText: { type: String, required: true }, // הטקסט המלא מוויקיפדיה
-  timelineEvents: { type: [Object], default: [] }, // אירועי ציר הזמן שחולצו
-  createdAt: { type: Date, default: Date.now }, // תאריך יצירה
+  query: { type: String, unique: true, required: true },
+  fullText: { type: String, required: true },
+  timelineEvents: { type: [Object], default: [] },
+  createdAt: { type: Date, default: Date.now },
 });
 
 const TimelineModel = mongoose.model('Timeline', timelineSchema);
 
-// --- פונקציות עזר ---
+// --- ✨ Gemini timeline generation function
+async function generateTimelineFromGemini(text) {
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-/**
- * פונקציה לחילוץ תאריכים עם הקשר מהטקסט של ויקיפדיה.
- * מזהה תאריכים בפורמט "חודש שנה" (לדוגמה: "January 2023")
- * ומחזירה אותם עם הטקסט השורה הרלוונטית, ממוינים לפי תאריך.
- */
-function extractDatesWithContext(text) {
-  // Regex לזיהוי תאריכים בפורמט "חודש שנה" (לדוגמה: December 1999)
-  const regex = /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4}\b/g;
-  const lines = text.split('\n'); // מפריד את הטקסט לשורות
+    const prompt = `
+      Summarize the following text in chronological order. For each year or date mentioned, describe what happened around that date. Return the result as a JSON array of objects in the following format:
+      [
+        { "date": "1905", "summary": "Publication of Einstein's special relativity papers" },
+        ...
+      ]
 
-  // מפה של חודשים למספרים (לצורך מיון תאריכים)
-  const monthMap = {
-    January: 0, February: 1, March: 2, April: 3,
-    May: 4, June: 5, July: 6, August: 7,
-    September: 8, October: 9, November: 10, December: 11
-  };
+      Text:"""${text}"""`;
 
-  // מילות מפתח שיש לדלג עליהן (לרוב קישורים או הערות שוליים)
-  const excludeKeywords = [
-    'Archived', 'Retrieved', 'Accessed', 'Wayback Machine', 'ISBN', 'doi',
-    'References', 'External links', 'Further reading', 'Coordinates',
-    'Wikimedia Commons', 'Template'
-  ];
+    const result = await model.generateContent(prompt);
+    const rawText = result.response.text();
 
-  const results = [];
+    const jsonStart = rawText.indexOf('[');
+    const jsonEnd = rawText.lastIndexOf(']');
+    const jsonText = rawText.slice(jsonStart, jsonEnd + 1);
 
-  lines.forEach(line => {
-    // בודק אם השורה מכילה מילת מפתח שיש לדלג עליה
-    if (excludeKeywords.some(keyword => line.includes(keyword))) {
-      return; // מדלג על השורה הנוכחית
-    }
-
-    const matches = [...line.matchAll(regex)]; // מוצא את כל ההתאמות ל-regex בשורה
-    if (matches.length > 0) {
-      matches.forEach(match => {
-        const dateStr = match[0]; // התאריך כפי שנמצא בטקסט (לדוגמה: "July 1969")
-        const [monthName, year] = dateStr.split(' ');
-        const dateObj = new Date(parseInt(year), monthMap[monthName]); // אובייקט Date לצורך מיון
-
-        // מנקה את התקציר משאריות לא רצויות (לדוגמה: סוגריים, רווחים מיותרים)
-        let summary = line.replace(/\[\d+\]/g, '').trim(); // מסיר מספרי הפניה כמו [1], [2]
-        if (summary.length < 10 || summary.length > 500) { // מסנן תקצירים קצרים או ארוכים מדי
-            return;
-        }
-
-        // בודק שלא הוכנס אירוע זהה כבר (לפי תאריך ותקציר)
-        if (!results.some(res => res.summary === summary && res.date === dateStr)) {
-          results.push({
-            date: dateStr,
-            summary: summary,
-            sortDate: dateObj // אובייקט Date למיון
-          });
-        }
-      });
-    }
-  });
-
-  // ממיין את התוצאות לפי תאריך עולה
-  results.sort((a, b) => a.sortDate.getTime() - b.sortDate.getTime());
-
-  // מחזיר את הנתונים בפורמט הרצוי לצד הלקוח (ללא אובייקט ה-Date)
-  return results.map(event => ({
-    date: event.date,
-    summary: event.summary,
-  }));
+    return JSON.parse(jsonText);
+  } catch (error) {
+    console.error('Gemini parsing error:', error);
+    return [];
+  }
 }
 
-
-// --- Routes ---
-
+// --- Routes
 app.get('/search', async (req, res) => {
-  console.log(`Received search request for: ${req.query.q}`);
   const query = req.query.q;
 
   if (!query) {
@@ -112,8 +72,7 @@ app.get('/search', async (req, res) => {
   }
 
   try {
-    // 1. נסה למצוא את המונח במטמון (DB)
-    const cachedData = await TimelineModel.findOne({ query: query.toLowerCase() }); // חיפוש ללא תלות ברישיות
+    const cachedData = await TimelineModel.findOne({ query: query.toLowerCase() });
     if (cachedData) {
       console.log(`Found "${query}" in cache.`);
       return res.json({
@@ -123,8 +82,6 @@ app.get('/search', async (req, res) => {
       });
     }
 
-    // 2. אם לא נמצא במטמון, שלוף מ-Wikipedia API
-    console.log(`"${query}" not in cache. Fetching from Wikipedia...`);
     const wikipediaUrl = `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&titles=${encodeURIComponent(query)}&explaintext=1&redirects=1`;
     const wikipediaResponse = await fetch(wikipediaUrl);
     const wikipediaData = await wikipediaResponse.json();
@@ -137,26 +94,25 @@ app.get('/search', async (req, res) => {
 
     if (page.missing) {
       fullText = `No exact match found on Wikipedia for "${query}".`;
-      console.log(fullText);
     } else {
       fullText = page.extract || 'No extract available from Wikipedia.';
-      timelineEvents = extractDatesWithContext(fullText);
-      console.log(`Extracted ${timelineEvents.length} timeline events.`);
+      timelineEvents = await generateTimelineFromGemini(fullText);
+      console.log(`Gemini generated ${timelineEvents.length} events.`);
     }
 
-    // 3. שמור את הנתונים החדשים ב-DB
     const newTimelineEntry = new TimelineModel({
-      query: query.toLowerCase(), // שמירה ללא תלות ברישיות
-      fullText: fullText,
-      timelineEvents: timelineEvents,
+      query: query.toLowerCase(),
+      fullText,
+      timelineEvents,
     });
+
     await newTimelineEntry.save();
     console.log(`Saved "${query}" to DB.`);
 
     return res.json({
       extract: fullText,
-      timelineEvents: timelineEvents,
-      source: 'wikipedia'
+      timelineEvents,
+      source: 'wikipedia + gemini'
     });
 
   } catch (error) {
@@ -165,7 +121,6 @@ app.get('/search', async (req, res) => {
   }
 });
 
-// הפעלת השרת
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
