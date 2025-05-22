@@ -1,112 +1,121 @@
+// src/App.jsx
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/searchBar';
 import TimelineEvent from './components/TimelineEvent';
-import './output.css';
-
-const extractDatesWithContext = (text) => {
-  const regex = /\b(January|February|March|April|May|June|July|August|September|October|November|December)\s\d{4}\b/g;
-  const lines = text.split('\n');
-
-  const monthMap = {
-    January: 0,
-    February: 1,
-    March: 2,
-    April: 3,
-    May: 4,
-    June: 5,
-    July: 6,
-    August: 7,
-    September: 8,
-    October: 9,
-    November: 10,
-    December: 11
-  };
-
-  const excludeKeywords = ['Archived', 'Retrieved', 'Accessed', 'Wayback', 'ISBN', 'doi'];
-
-  const results = [];
-
-  lines.forEach(line => {
-    if (excludeKeywords.some(keyword => line.includes(keyword))) return;
-
-    const match = line.match(regex);
-    if (match) {
-      match.forEach(dateStr => {
-        const [monthName, year] = dateStr.split(' ');
-        const dateObj = new Date(parseInt(year), monthMap[monthName]);
-
-        results.push({
-          date: dateStr,
-          summary: line.trim(),
-          sortDate: dateObj
-        });
-      });
-    }
-  });
-
-  results.sort((a, b) => a.sortDate - b.sortDate);
-
-  return results;
-};
+import './App.css'; // שיניתי את הייבוא ל-App.css במקום index.css כדי שיהיה ברור שזה ה-CSS של האפליקציה
 
 function App() {
   const [query, setQuery] = useState('');
   const [fullText, setFullText] = useState('');
   const [timelineEvents, setTimelineEvents] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [source, setSource] = useState('');
 
   useEffect(() => {
-    if (!query) return;
+    if (!query) {
+      setFullText('');
+      setTimelineEvents([]);
+      setSource('');
+      setError(null);
+      return;
+    }
 
-    const fetchFullPage = async () => {
+    const fetchTimelineData = async () => {
       setLoading(true);
+      setError(null);
+      setFullText('');
+      setTimelineEvents([]);
+      setSource('');
+
       try {
-        const res = await fetch(
-          `https://en.wikipedia.org/w/api.php?action=query&format=json&prop=extracts&titles=${encodeURIComponent(
-            query
-          )}&origin=*&explaintext=true`
-        );
-        const data = await res.json();
-        const pages = data.query.pages;
-        const pageId = Object.keys(pages)[0];
-        const extract = pages[pageId]?.extract || 'No extract found';
-        console.log('EXTRACT:', extract);
+        const response = await fetch(`http://localhost:4000/search?q=${encodeURIComponent(query)}`);
 
-        setFullText(extract);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Something went wrong on the server.');
+        }
 
-        const events = extractDatesWithContext(extract);
-        setTimelineEvents(events);
-      } catch (error) {
-        setFullText('Error fetching data');
+        const data = await response.json();
+        console.log('Data received from server:', data);
+
+        setFullText(data.extract);
+        setTimelineEvents(data.timelineEvents);
+        setSource(data.source);
+
+      } catch (err) {
+        console.error('Fetch error:', err);
+        setError(`Failed to load timeline: ${err.message}`);
+        setFullText('');
+        setTimelineEvents([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchFullPage();
+    fetchTimelineData();
   }, [query]);
 
   return (
-  <div style={{ padding: '20px' }}>
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-      <h1 className="text-4xl font-bold text-[#006A71] mb-4">Timeline Search</h1>
+    <div className="app-container">
+      <h1 className="app-title">Timeline Search</h1>
+
       <SearchBar onSearch={setQuery} />
-      {query && !loading && <h2>{`"${query}"`}</h2>}
+
+      {query && (
+        <p className="search-query-display">
+          {`Searching for: `}
+          <span className="query-text">{query}</span>
+        </p>
+      )}
+
+      {loading && (
+        <p className="loading-message">Loading timeline...</p>
+      )}
+
+      {error && (
+        <div className="error-box">
+          <p className="error-title">Error:</p>
+          <p>{error}</p>
+        </div>
+      )}
+
+      {!loading && !error && query && fullText && (
+        <div className="results-container">
+          <h2 className="results-title">
+            {`Results for "${query}" `}
+            {source && <span className="source-text">({source})</span>}
+          </h2>
+          <p className="full-text-display">
+            {fullText}
+          </p>
+
+          {timelineEvents.length > 0 ? (
+            <div className="timeline-events-container">
+              {timelineEvents.map((event, index) => (
+                <TimelineEvent
+                  key={index}
+                  date={event.date}
+                  summary={event.summary}
+                  index={index}
+                />
+              ))}
+            </div>
+          ) : (
+            <p className="no-events-message">
+              No specific timeline events found for "{query}" in the extract.
+            </p>
+          )}
+        </div>
+      )}
+
+      {!loading && !error && query && !fullText && (
+          <p className="no-data-message">
+              No data found on Wikipedia for "{query}". Please try a different search term.
+          </p>
+      )}
     </div>
-
-    {loading ? (
-      <p style={{ textAlign: 'center' }}>Loading...</p>
-    ) : (
-      <div className="timeline-container">
-        <div className="timeline-line" />
-        {timelineEvents.map((event, index) => (
-          <TimelineEvent key={index} date={event.date} summary={event.summary} index={index} />
-        ))}
-      </div>
-    )}
-  </div>
-);
-
+  );
 }
 
 export default App;

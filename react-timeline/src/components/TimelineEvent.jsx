@@ -1,5 +1,6 @@
+// src/components/TimelineEvent.jsx
 import React, { useState } from 'react';
-import './TimelineEvent.css'; 
+import './TimelineEvent.css';
 
 const TimelineEvent = ({ date, summary, index }) => {
   const [showSummary, setShowSummary] = useState(false);
