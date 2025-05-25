@@ -1,10 +1,19 @@
 /**
  * HistoryFlow Registration Page JavaScript
  * Enhanced for accessibility, security, and UX
- * @version 1.0.5
+ * @version 1.0.7
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Debug localStorage to ensure it's working
+    try {
+        localStorage.setItem('test', 'test');
+        console.log('✅ localStorage is working');
+        localStorage.removeItem('test');
+    } catch (e) {
+        console.error('❌ localStorage error:', e);
+    }
+    
     // Generate CSRF token and set in form
     const csrfToken = generateCSRFToken();
     document.getElementById('csrfToken').value = csrfToken;
@@ -24,6 +33,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPassword');
     const errorContainer = document.getElementById('errorContainer');
     const successMessage = document.getElementById('successMessage');
+    
+    // New optional profile fields
+    const profileBioInput = document.getElementById('profileBio');
+    const interestCheckboxes = document.querySelectorAll('input[name="interests[]"]');
     
     // CAPTCHA elements
     const mockCaptcha = document.getElementById('mockCaptcha');
@@ -61,14 +74,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Form validation and submission
     registerForm.addEventListener('submit', function(e) {
         e.preventDefault();
+        console.log('🔍 Form submission started');
         
         // Reset all errors
         clearAllErrors();
         
         // Validate all fields
         const isValid = validateAllFields();
+        console.log('🔍 Form validation result:', isValid);
         
         if (!isValid) {
+            console.log('❌ Validation failed, stopping submission');
             // Focus the first invalid field for accessibility
             focusFirstInvalidField();
             return;
@@ -79,6 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Verify CAPTCHA
         if (!captchaVerified) {
+            console.log('❌ CAPTCHA not verified');
             showGlobalError('Please complete the "I\'m not a robot" verification.');
             hideLoadingState();
             return;
@@ -89,13 +106,31 @@ document.addEventListener('DOMContentLoaded', function() {
         const lastName = lastNameInput.value.trim();
         const email = emailInput.value.trim();
         
+        // Get bio if provided
+        const bio = profileBioInput ? profileBioInput.value.trim() : '';
+        
+        // Get selected interests
+        const interests = [];
+        interestCheckboxes.forEach(checkbox => {
+            if (checkbox.checked) {
+                interests.push(checkbox.value);
+            }
+        });
+        
         // Get existing users or initialize empty array
-        let users = JSON.parse(localStorage.getItem('users')) || [];
+        let users = [];
+        try {
+            users = JSON.parse(localStorage.getItem('users')) || [];
+        } catch (error) {
+            console.error('❌ Error parsing users from localStorage:', error);
+            users = [];
+        }
         
         // Check for existing users
         const emailExists = users.some(user => user.email.toLowerCase() === email.toLowerCase());
         
         if (emailExists) {
+            console.log('❌ Email already exists');
             showGlobalError('Email already exists. Please use a different email or login.');
             hideLoadingState();
             emailInput.focus();
@@ -114,8 +149,8 @@ document.addEventListener('DOMContentLoaded', function() {
             registerDate: new Date().toISOString(),
             gdprConsent: gdprConsentCheckbox.checked,
             id: generateUserId(),
-            bio: '',
-            interests: [],
+            bio: bio || '',
+            interests: interests || [],
             searchHistory: [],
             savedTimelines: [],
             profileImage: null
@@ -124,11 +159,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add new user to array
         users.push(user);
         
+        // Also set as currentUser for immediate login after registration
+        const currentUser = {...user};
+        
         // Simulate network request to server
         setTimeout(function() {
             try {
                 // Store updated users array in localStorage
                 localStorage.setItem('users', JSON.stringify(users));
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                console.log('✅ User registered successfully');
                 
                 // Log registration success (in production, send to analytics)
                 logEvent('registration_success', { email });
@@ -137,12 +177,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 registerForm.hidden = true;
                 successMessage.hidden = false;
                 
+                console.log('🔄 About to redirect to index.html in 2 seconds');
+                
                 // Redirect to login page after delay
                 setTimeout(function() {
+                    console.log('🔄 Redirecting now...');
                     window.location.href = 'index.html';
                 }, 2000);
             } catch (error) {
                 // Handle errors (localStorage full, etc)
+                console.error('❌ Registration error:', error);
                 logError('registration_error', error);
                 hideLoadingState();
                 showGlobalError('An error occurred during registration. Please try again.');
@@ -276,6 +320,8 @@ document.addEventListener('DOMContentLoaded', function() {
             checkmark.style.transform = 'translate(-50%, -50%)';
             captchaCheckbox.innerHTML = '';
             captchaCheckbox.appendChild(checkmark);
+            
+            console.log('✅ CAPTCHA verified successfully');
         } else {
             // Failed - show error and generate a new problem
             captchaError.textContent = 'Incorrect answer. Try another problem:';
@@ -342,6 +388,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showCheckboxError(gdprConsentCheckbox, 'You must consent to the data storage policy');
             isValid = false;
         }
+        
+        // Note: We don't validate bio and interests since they're optional
         
         return isValid;
     }
@@ -470,8 +518,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const buttonText = registerButton.querySelector('span');
         const buttonLoader = registerButton.querySelector('.button-loader');
         
-        buttonText.textContent = 'Registering...';
-        buttonLoader.hidden = false;
+        if (buttonText && buttonLoader) {
+            buttonText.textContent = 'Registering...';
+            buttonLoader.hidden = false;
+        }
+        
         registerButton.disabled = true;
         registerButton.classList.add('loading');
     }
@@ -483,8 +534,14 @@ document.addEventListener('DOMContentLoaded', function() {
         const buttonText = registerButton.querySelector('span');
         const buttonLoader = registerButton.querySelector('.button-loader');
         
-        buttonText.textContent = 'Register';
-        buttonLoader.hidden = true;
+        if (buttonText) {
+            buttonText.textContent = 'Register';
+        }
+        
+        if (buttonLoader) {
+            buttonLoader.hidden = true;
+        }
+        
         registerButton.disabled = false;
         registerButton.classList.remove('loading');
     }
@@ -572,7 +629,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const strengthText = document.querySelector('.strength-text');
         
         // Update strength meter fill
-        meterFill.setAttribute('data-strength', strength);
+        if (meterFill) {
+            meterFill.setAttribute('data-strength', strength);
+        }
         
         // Update strength text
         let strengthLabel = 'Too weak';
@@ -595,10 +654,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
         }
         
-        strengthText.textContent = `Password strength: ${strengthLabel}`;
+        if (strengthText) {
+            strengthText.textContent = `Password strength: ${strengthLabel}`;
+        }
         
         // Update for screen readers
-        document.getElementById('passwordStrength').setAttribute('aria-label', `Password strength: ${strengthLabel}`);
+        const passwordStrength = document.getElementById('passwordStrength');
+        if (passwordStrength) {
+            passwordStrength.setAttribute('aria-label', `Password strength: ${strengthLabel}`);
+        }
     }
     
     /**
