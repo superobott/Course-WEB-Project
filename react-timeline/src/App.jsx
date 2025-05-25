@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import SearchBar from './components/searchBar';
 import TimelineEvent from './components/TimelineEvent';
+import Header from './components/Header';
+import Footer from './components/Footer';
 import './App.css'; 
+
 
 function App() {
   const [query, setQuery] = useState('');
@@ -57,6 +60,8 @@ function App() {
 
   return (
     <div className="app-container">
+
+      <Header />
       <h1 className="app-title">Timeline Search</h1>
 
       <SearchBar onSearch={setQuery} />
@@ -85,9 +90,10 @@ function App() {
             {`Results for "${query}" `}
             {source && <span className="source-text">({source})</span>}
           </h2>
-          <p className="full-text-display">
-            {fullText}
-          </p>
+          <details className="full-text-details">
+            <summary className="full-text-summary">Show Wikipedia summary</summary>
+              <p className="full-text-display">{fullText}</p>
+          </details>
 
           {timelineEvents.length > 0 ? (
             <div className="timeline-events-container">
@@ -113,6 +119,7 @@ function App() {
               No data found on Wikipedia for "{query}". Please try a different search term.
           </p>
       )}
+      <Footer />
     </div>
   );
 }

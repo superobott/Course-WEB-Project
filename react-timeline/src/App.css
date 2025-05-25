@@ -1,7 +1,7 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f3f4f6; 
+  background-color: #F2EFE7; 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -11,34 +11,33 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
   box-sizing: border-box; 
 }
 
 .app-title {
-  font-size: 3rem; /* גודל כותרת גדול */
-  font-weight: 800; /* עובי גופן אקסטרה בולד */
-  color: #006A71; /* צבע ירוק-כחול */
-  margin-bottom: 32px; /* מרווח תחתון */
+  font-size: 3rem; 
+  font-weight: 800; 
+  color: #006A71; 
+  margin-bottom: 32px; 
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2); /* צל עדין לטקסט */
 }
 
 .search-query-display {
   margin-top: 16px;
-  font-size: 1.25rem; /* גודל טקסט XL */
-  color: #4b5563; /* אפור 700 */
+  font-size: 1.25rem;
+  color: #00285f; 
 }
 
 .query-text {
-  font-weight: 600; /* עובי גופן סמי-בולד */
-  color: #2563eb; /* כחול 800 */
+  font-weight: 600; 
+  color: hsl(221, 98%, 32%); 
 }
 
 .loading-message {
   margin-top: 32px;
-  font-size: 1.5rem; /* גודל טקסט 2XL */
-  color: #6b7280; /* אפור 600 */
-  animation: pulse 1.5s infinite ease-in-out; /* אנימציית פעימה */
+  font-size: 1.5rem; 
+  color: #6b7280; 
+  animation: pulse 1.5s infinite ease-in-out;
 }
 
 @keyframes pulse {
@@ -53,9 +52,9 @@ body {
 .error-box {
   margin-top: 32px;
   padding: 16px;
-  background-color: #fee2e2; /* אדום 100 */
-  border: 1px solid #ef4444; /* אדום 400 */
-  color: #b91c1c; /* אדום 700 */
+  background-color: #fee2e2; 
+  border: 1px solid #ef4444; 
+  color: #b91c1c; 
   border-radius: 8px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -67,54 +66,54 @@ body {
 
 .results-container {
   width: 100%;
-  max-width: 900px; /* רוחב מקסימלי */
+  max-width: 900px; 
   margin-top: 32px;
-  background-color: #ffffff; /* לבן */
+  background-color: #ffffff; 
   padding: 24px;
   border-radius: 8px;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* צל גדול יותר */
-  border: 1px solid #e5e7eb; /* אפור 200 */
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); 
+  border: 1px solid #e5e7eb; 
 }
 
 .results-title {
-  font-size: 2rem; /* גודל כותרת 3XL */
+  font-size: 2rem; 
   font-weight: bold;
-  color: #1f2937; /* אפור 800 */
+  color: #006A71; 
   margin-bottom: 16px;
 }
 
 .source-text {
-  font-size: 1rem; /* גודל טקסט בסיסי */
-  color: #6b7280; /* אפור 500 */
+  font-size: 1rem; 
+  color: #6b7280; 
 }
 
 .full-text-display {
-  color: #374151; /* אפור 700 */
-  line-height: 1.6; /* מרווח שורות נוח לקריאה */
+  color: #374151; 
+  line-height: 1.6; 
   margin-bottom: 24px;
-  max-height: 240px; /* גובה מקסימלי, עם גלילה */
-  overflow-y: auto; /* מאפשר גלילה אנכית */
-  border: 1px solid #d1d5db; /* אפור 300 */
+  max-height: 240px; 
+  overflow-y: auto; 
+  border: 1px solid #d1d5db; 
   padding: 12px;
   border-radius: 4px;
-  background-color: #f9fafb; /* אפור 50 */
+  background-color: #f9fafb; 
 }
 
 .timeline-events-container {
   position: relative; 
   padding: 20px; 
 }
-/* הקו המרכזי */
+
 .timeline-events-container::before {
   content: ''; 
   position: absolute; 
   top: 0;
   bottom: 0;
-  left: 50%; /* ממקם את הקו במרכז הקונטיינר */
+  left: 50%; 
   width: 4px;
   background-color: #006A71;
-  transform: translateX(-50%); /* מזיז את הקו חזרה בחצי מרוחבו כדי שיהיה בדיוק במרכז */
-  z-index: 0; /* וודא שהקו מאחורי האירועים */
+  transform: translateX(-50%); 
+  z-index: 0; 
 }
 
 .no-events-message,
@@ -123,4 +122,67 @@ body {
   font-size: 1.25rem;
   color: #6b7280;
   margin-top: 32px;
+}
+
+.full-text-details {
+  margin: 1em 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5em;
+  background-color: #f9f9f9;
+}
+
+.full-text-summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #0077cc;
+}
+
+.full-text-summary:hover {
+  text-decoration: underline;
+}
+
+.full-text-display {
+  margin-top: 0.5em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  background-color: #006A71; 
+  color: #F2EFE7;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+
+/* Footer */
+.footer {
+  width: 100%;
+  background-color: #004f53; 
+  color: #F2EFE7; 
+  padding: 15px 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 40px;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+
+.footer a {
+  color: #a8d0d6;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: #f2efe7;
+  text-decoration: underline;
 }
