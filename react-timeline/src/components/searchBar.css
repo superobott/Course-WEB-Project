@@ -1,0 +1,51 @@
+.search-bar-form {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* מרווח קטן יותר בין האלמנטים */
+  margin-top: 25px; /* מרווח עליון מעט קטן יותר */
+  width: 100%;
+  max-width: 500px; /* רוחב מקסימלי קטן יותר לסרגל החיפוש */
+  padding: 0 15px; /* ריווח פנימי מהצדדים */
+  box-sizing: border-box;
+}
+
+.search-bar-form input[type="text"] {
+  flex-grow: 1;
+  padding: 10px 15px; /* ריווח פנימי קטן יותר לתיבת הטקסט */
+  border: 2px solid #006A71;
+  border-radius: 8px; /* פינות מעוגלות פחות */
+  font-size: 1rem; /* גודל גופן סטנדרטי יותר */
+  color: #374151;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
+  transition: all 0.3s ease;
+}
+
+.search-bar-form input[type="text"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* צל זוהר עדין יותר בריכוז */
+}
+
+.search-bar-form button {
+  background-color: #006A71;
+  color: #ffffff;
+  padding: 10px 20px; /* ריווח פנימי קטן יותר לכפתור */
+  border: none;
+  border-radius: 8px; /* פינות מעוגלות פחות */
+  font-size: 1rem; /* גודל גופן סטנדרטי יותר */
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
+}
+
+.search-bar-form button:hover {
+  background-color: #004d52;
+  transform: translateY(-1px); 
+}
+
+.search-bar-form button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}

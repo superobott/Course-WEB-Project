@@ -9,6 +9,58 @@
     <link rel="stylesheet" href="/HistoryFlow/src/styles/main.css">
     <link rel="stylesheet" href="/HistoryFlow/src/styles/profile.css">
     <link rel="stylesheet" href="/HistoryFlow/src/output.css">    <!-- Main profile script -->
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        
+        // Redirect to login if not authenticated
+        if (!currentUser) {
+            window.location.href = 'login.html';
+        }
+        
+        function updateUserData(newData) {
+            const updatedUser = { ...currentUser, ...newData };
+            localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+            
+            // Also update in users collection if needed
+            const users = JSON.parse(localStorage.getItem('users')) || {};
+            users[currentUser.email] = updatedUser;
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            location.reload();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load user data
+            document.getElementById('profileName').textContent = currentUser.fullName || 'No Name Set';
+            document.getElementById('profileBio').textContent = currentUser.bio || 'No bio available';
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('email').value = currentUser.email;
+            document.getElementById('fullName').value = currentUser.fullName || '';
+            document.querySelector('#profileBio').value = currentUser.bio || '';
+            
+            // Update interests
+            const interestsContainer = document.getElementById('profileInterests');
+            if (currentUser.interests && currentUser.interests.length > 0) {
+                interestsContainer.innerHTML = currentUser.interests
+                    .map(interest => `<span class="inline-block bg-[#9ACBD0] text-[#006A71] px-3 py-1 rounded-full mr-2 mb-2">${interest}</span>`)
+                    .join('');
+            }
+
+            // Update form checkboxes
+            if (currentUser.interests) {
+                currentUser.interests.forEach(interest => {
+                    const checkbox = document.getElementById(`interest-${interest}`);
+                    if (checkbox) checkbox.checked = true;
+                });
+            }
+            
+            // Set notification preferences if they exist
+            if (currentUser.preferences) {
+                document.getElementById('emailNotifications').checked = currentUser.preferences.emailNotifications || false;
+                document.getElementById('newsUpdates').checked = currentUser.preferences.newsUpdates || false;
+            }
+        });
+    </script>
     <script src="/HistoryFlow/src/logic/profile.js" defer></script>
 </head>
 <body class="bg-gray-100">
