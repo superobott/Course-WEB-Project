@@ -1,8 +1,7 @@
-// register.js
 /**
  * HistoryFlow Registration Page JavaScript
  * Enhanced for accessibility, security, and UX
- * @version 1.0.3
+ * @version 1.0.5
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,6 +11,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Store form elements
     const registerForm = document.getElementById('registerForm');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
@@ -41,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCaptcha();
     
     // Focus the first input on page load for accessibility
-    emailInput.focus();
+    firstNameInput.focus();
     
     // Password toggle visibility functionality
     togglePasswordBtn.addEventListener('click', function() {
@@ -84,6 +85,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Get user data
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
         const email = emailInput.value.trim();
         
         // Get existing users or initialize empty array
@@ -101,13 +104,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create user object - in a real app, you would hash the password
         const user = {
+            firstName: firstName,
+            lastName: lastName,
+            fullName: `${firstName} ${lastName}`.trim(),
             email: email,
             password: passwordInput.value, // NEVER store plain passwords in production
             securityQuestion: securityQuestionInput.value,
             securityAnswer: securityAnswerInput.value,
             registerDate: new Date().toISOString(),
             gdprConsent: gdprConsentCheckbox.checked,
-            id: generateUserId()
+            id: generateUserId(),
+            bio: '',
+            interests: [],
+            searchHistory: [],
+            savedTimelines: [],
+            profileImage: null
         };
         
         // Add new user to array
@@ -128,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Redirect to login page after delay
                 setTimeout(function() {
-                    window.location.href = 'login.html';
+                    window.location.href = 'index.html';
                 }, 2000);
             } catch (error) {
                 // Handle errors (localStorage full, etc)
@@ -140,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Input event listeners to clear errors when user types
-    const allInputs = [emailInput, passwordInput, confirmPasswordInput, securityQuestionInput, securityAnswerInput];
+    const allInputs = [firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput, securityQuestionInput, securityAnswerInput];
     allInputs.forEach(input => {
         input.addEventListener('input', function() {
             clearError(input);
@@ -280,6 +291,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateAllFields() {
         let isValid = true;
         
+        // Validate first name
+        if (!firstNameInput.value.trim()) {
+            showError(firstNameInput, 'Please enter your first name');
+            isValid = false;
+        }
+        
+        // Validate last name
+        if (!lastNameInput.value.trim()) {
+            showError(lastNameInput, 'Please enter your last name');
+            isValid = false;
+        }
+        
         // Validate email
         if (!validateEmail(emailInput.value)) {
             showError(emailInput, 'Please enter a valid email address');
@@ -329,7 +352,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function focusFirstInvalidField() {
         // Find first input with an error message
         const invalidInputs = [
-            emailInput, passwordInput, confirmPasswordInput,
+            firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput,
             securityQuestionInput, securityAnswerInput, gdprConsentCheckbox
         ].filter(input => {
             const errorId = `${input.id}Error`;
@@ -417,7 +440,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearAllErrors() {
         // Clear field-specific errors
         const allInputsAndCheckboxes = [
-            emailInput, passwordInput, confirmPasswordInput,
+            firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput,
             securityQuestionInput, securityAnswerInput, gdprConsentCheckbox
         ];
         

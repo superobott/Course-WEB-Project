@@ -3,7 +3,7 @@ function generateTimelineLines() {
     const trackWidth = track.clientWidth;
     const smallSpacing = 5;  // Base spacing unit
     const startYear = 1000;
-    const endYear = 2020;
+    const endYear = 2025;
     
     track.innerHTML = '';
     
@@ -18,26 +18,41 @@ function generateTimelineLines() {
         lineWrapper.className = 'line-wrapper';
         
         const line = document.createElement('div');
-        line.className = 'line bg-[#9ACBD0] h-4 w-[1px]';
+        line.className = 'line bg-[#9ACBD0] h-4 w-[1px] hover-tooltip';
         line.style.marginLeft = `${smallSpacing}px`;
         line.setAttribute('data-tooltip', `${year}`);
         
         // If it's a decade year (divisible by 10), create medium line
         if (year % 10 === 0) {
-            line.className = 'line bg-[#48A6A7] h-8 w-[2px]';
+            line.className = 'line bg-[#48A6A7] h-8 w-[2px] permanent-tooltip';
             line.style.zhome = '5';
         }
         
         // If it's a century year (divisible by 100), create big line
         if (year % 100 === 0) {
-            line.className = 'line bg-[#006A71] h-16 w-1';
+            line.className = 'line bg-[#006A71] h-16 w-1 permanent-tooltip';
             line.style.zhome = '10';
         }
         
         lineWrapper.appendChild(line);
         track.appendChild(lineWrapper);
     }
+
+    track.scrollLeft = track.scrollWidth
 }
+// Update event listeners
+document.addEventListener('DOMContentLoaded', () => {
+    generateTimelineLines();
+    initializeScrollButtons();
+    
+    // Add a small delay to ensure the scroll happens after the lines are fully rendered
+    setTimeout(() => {
+        const track = document.getElementById('timelineTrack');
+        track.scrollLeft = track.scrollWidth;
+    }, 100);
+});
+
+
 
 // Generate lines initially when DOM is loaded
 document.addEventListener('DOMContentLoaded', generateTimelineLines);
@@ -85,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Check if clicked element is a timeline line
         if (clickedElement.classList.contains('line')) {
             const year = clickedElement.getAttribute('data-tooltip');
-            window.location.href = `results.html?type=timeline&year=${year}`;
+            window.location.href = `results.html?type=timeline&year=${encodeURIComponent(year)}`;
         }
     });
 

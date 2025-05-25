@@ -1,0 +1,61 @@
+/* Global variables (using Tailwind's built-in theming instead) */
+/* Colors are part of the Tailwind color palette, can be adjusted in the tailwind.config.js */
+:root {
+  --hf-cream: #F2EFE7;
+  --hf-mint: #9ACBD0;
+  --hf-teal: #48A6A7;
+  --hf-deep: #006A71;
+  --hf-error: #e53e3e;
+  --hf-success: #38a169;
+  --hf-warning: #dd6b20;
+  --hf-border: #9ACBD0;
+  --hf-text: #006A71;
+}
+
+/* Layout utilities (Tailwind already provides many of these utilities) */
+.container {
+  @apply w-full max-w-screen-xl mx-auto px-4;
+}
+
+.text-center {
+  @apply text-center;
+}
+
+.hidden {
+  @apply hidden;
+}
+
+/* Header and Footer */
+.header, .footer {
+  @apply bg-hf-deep text-hf-cream py-6;
+}
+
+/* Form components */
+.form-group {
+  @apply mb-5;
+}
+
+.form-label {
+  @apply block mb-2 font-medium text-hf-deep;
+}
+
+.form-input, select {
+  @apply w-full py-3 px-4 border border-hf-border rounded-md text-base focus:outline-none focus:ring-2 focus:ring-hf-teal;
+}
+
+/* Buttons */
+.btn {
+  @apply inline-block py-3 px-6 rounded-md transition duration-300 ease-in-out;
+}
+
+.btn-primary {
+  @apply bg-hf-deep text-white hover:bg-hf-cream border-2 border-hf-deep;
+}
+
+.btn-primary:hover {
+  @apply bg-hf-cream text-hf-deep transform translate-y-1 shadow-lg;
+}
+
+.alert-box {
+  @apply py-3 px-4 rounded-md mb-4;
+}
