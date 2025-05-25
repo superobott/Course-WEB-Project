@@ -1,0 +1,255 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #F2EFE7;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-container {
+  min-height: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-sizing: border-box;
+}
+
+.app-title {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #006A71;
+  margin-bottom: 32px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.search-query-display {
+  margin-top: 16px;
+  font-size: 1.25rem;
+  color: #00285f;
+}
+
+.query-text {
+  font-weight: 600;
+  color: hsl(221, 98%, 32%);
+}
+
+.loading-message {
+  margin-top: 32px;
+  font-size: 1.5rem;
+  color: #6b7280;
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.error-box {
+  margin-top: 32px;
+  padding: 16px;
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #b91c1c;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.error-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}
+
+/* --- Styles for the main content layout --- */
+.app-content-wrapper {
+  flex-grow: 1;
+  display: grid;
+  grid-template-columns: 1fr; /* Default to single column for smaller screens */
+  gap: 20px;
+  padding: 20px;
+  width: 100%;
+  box-sizing: border-box;
+  /* **Adjust this max-width to control the overall width of your content area** */
+  max-width: 1400px; /* <--- INCREASE THIS VALUE (e.g., 1400px, 1600px, etc.) */
+  margin: 0 auto; /* Center the wrapper */
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .app-content-wrapper {
+    /* If you increased max-width above, you might want to adjust side column width or use 'auto' */
+    /* Example: making side columns auto-sized (based on content) or increasing their fixed size */
+    grid-template-columns: 250px 1fr 250px; /* Left column, main content, right column */
+    /* Or, for more flexibility if you want sidebars to size with content: */
+    /* grid-template-columns: auto 1fr auto; */
+    gap: 30px;
+  }
+
+  .timeline-images-left {
+    grid-column: 1;
+  }
+
+  .results-container {
+    grid-column: 2;
+  }
+
+  .timeline-images-right {
+    grid-column: 3;
+  }
+
+  .timeline-images-left,
+  .timeline-images-right {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-height: calc(100vh - 150px);
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+
+  .timeline-images-left::-webkit-scrollbar,
+  .timeline-images-right::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .timeline-images-left::-webkit-scrollbar-track,
+  .timeline-images-right::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .timeline-images-left::-webkit-scrollbar-thumb,
+  .timeline-images-right::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .timeline-images-left::-webkit-scrollbar-thumb:hover,
+  .timeline-images-right::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
+
+/* --- Existing styles for .results-container, ensure no max-width is limiting it --- */
+.results-container {
+  width: 100%; /* This is correct: take 100% of the allocated grid column */
+  /* Remove or ensure 'max-width' is NOT here if you want it to expand with the '1fr' column */
+  background-color: #ffffff;
+  padding: 24px;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+}
+
+.results-title {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #006A71;
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.source-text {
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+.full-text-details {
+  margin: 1em 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 0.5em;
+  background-color: #f9f9f9;
+}
+
+.full-text-summary {
+  cursor: pointer;
+  font-weight: bold;
+  color: #0077cc;
+}
+
+.full-text-summary:hover {
+  text-decoration: underline;
+}
+
+.full-text-display {
+  margin-top: 0.5em;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  color: #374151;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid #d1d5db;
+  padding: 12px;
+  border-radius: 4px;
+  background-color: #f9fafb;
+}
+
+.timeline-events-container {
+  position: relative;
+  padding: 20px;
+  padding-left: 50px; /* Example: space on the left */
+  padding-right: 50px; /* Example: space on the right */
+}
+
+.timeline-events-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%; /* Position the left edge of the line at the horizontal center of its parent */
+  width: 4px;
+  background-color: #006A71;
+  transform: translateX(-50%); /* Move the line back by half its own width to truly center it */
+  z-index: 0;
+}
+
+.no-events-message,
+.no-data-message {
+  text-align: center;
+  font-size: 1.25rem;
+  color: #6b7280;
+  margin-top: 32px;
+}
+
+/* Header */
+.header {
+  width: 100%;
+  background-color: #006A71;
+  color: #F2EFE7;
+  padding: 20px 0;
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  user-select: none;
+}
+
+/* Footer */
+.footer {
+  width: 100%;
+  background-color: #004f53;
+  color: #F2EFE7;
+  padding: 15px 0;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-top: 40px;
+  box-shadow: inset 0 1px 3px rgba(255, 255, 255, 0.1);
+  user-select: none;
+}
+
+.footer a {
+  color: #a8d0d6;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footer a:hover {
+  color: #f2efe7;
+  text-decoration: underline;
+}
