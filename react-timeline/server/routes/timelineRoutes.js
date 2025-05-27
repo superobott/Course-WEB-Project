@@ -9,8 +9,18 @@ const fetch = require('node-fetch');
 //Routes
 router.get('/search', async (req, res) => {
   const query = req.query.q;
-  const startYear = extractYear(req.query.startYear);
-  const endYear = extractYear(req.query.endYear);
+  const startYearInput = req.query.startYear;
+  const endYearInput = req.query.endYear;
+
+  let startYear = extractYear(startYearInput); 
+  let endYear = extractYear(endYearInput);
+
+  if (startYear !== null && (endYear === null || endYearInput === undefined || endYearInput === "")) {
+  endYear = new Date().getFullYear();
+  }
+  if ((startYear === null || startYearInput === undefined || startYearInput === "") && endYear !== null) {
+    startYear = 1900;
+  }
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter "q" is required.' });

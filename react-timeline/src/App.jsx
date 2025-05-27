@@ -121,8 +121,12 @@ function App() {
             {fullText ? (
               <div className="results-container">
                 <h2 className="results-title">
-                  {`Results for "${query}" `}
-                  {source && <span className="source-text">({source})</span>}
+                  {`Results for "${query}"`}
+                  {(startYear || endYear) && (
+                    <>
+                      {` from: ${startYear || '1900'} to: ${endYear || '2024'}`}
+                    </>
+                  )}
                 </h2>
                 <details className="full-text-details">
                   <summary className="full-text-summary">Show Wikipedia summary</summary>

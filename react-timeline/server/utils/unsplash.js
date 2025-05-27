@@ -4,7 +4,6 @@ const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 // Function to fetch images from Unsplash based on the query
 async function fetchUnsplashImages(query) {
   const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${UNSPLASH_ACCESS_KEY}&per_page=20`;
-
   try {
     const response = await fetch(url);
     const data = await response.json();
