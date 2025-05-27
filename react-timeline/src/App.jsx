@@ -54,6 +54,7 @@ function App() {
         setTimelineEvents(data.timelineEvents);
         setImages(data.images || []);
 
+
       } catch (err) {
         console.error('Fetch error:', err);
         setError(`Failed to load timeline: ${err.message}`);
