@@ -75,3 +75,9 @@
   border-color: #2563eb;
   box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
 }
+
+.search-error {
+  color: #b91c1c;
+  margin-top: 8px;
+  font-size: 1rem;
+}

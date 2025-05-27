@@ -5,20 +5,25 @@ function SearchBar({ onSearch }) {
   const [term, setTerm] = useState('');
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
+  const [error, setError] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (term.trim()) {
-      onSearch({
-        query: term,
-        startYear,
-        endYear,
-      });
-      setTerm('');        
-      setStartYear('');   
-      setEndYear('');   
+    if (!term.trim()) {
+      setError('Please enter a search term.');
+      return;
     }
+    setError('');
+    onSearch({
+      query: term,
+      startYear,
+      endYear,
+    });
+    setTerm('');        
+    setStartYear('');   
+    setEndYear('');   
   };
+
   return (
     <form onSubmit={handleSubmit} className="search-bar-form" >
     
@@ -46,7 +51,8 @@ function SearchBar({ onSearch }) {
       />
     </div>
 
-    <button type="submit">search</button> {}
+    <button type="submit">search</button> 
+    {error && <div className="search-error">{error}</div>}
     </form>
   );
 }

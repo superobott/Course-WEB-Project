@@ -181,15 +181,16 @@ app.get('/search', async (req, res) => {
 
     const pageId = Object.keys(wikipediaData.query.pages)[0];
     const page = wikipediaData.query.pages[pageId];
-
     let fullText = '';
     let timelineEvents = [];
     let images = [];
 
     if (page.missing) {
       fullText = `No exact match found on Wikipedia for "${query}".`;
+      images=[];
+      console.log("term doesnt found");
     } else {
-      fullText = page.extract || 'No extract available from Wikipedia.';
+      fullText = page.extract || `No extract available from Wikipedia for "${query}".`;
       timelineEvents = await generateTimelineFromGemini(fullText);
       timelineEvents = sortTimelineEvents(timelineEvents);
       timelineEvents = timelineEvents.filter(event => extractYear(event.date) !== null);
