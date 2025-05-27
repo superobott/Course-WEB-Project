@@ -15,6 +15,9 @@ function App() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [source, setSource] = useState('');
+  const [startYear, setStartYear] = useState('');
+  const [endYear, setEndYear] = useState('');
+
 
   useEffect(() => {
     if (!query) {
@@ -35,7 +38,11 @@ function App() {
       setSource('');
 
       try {
-        const response = await fetch(`http://localhost:4000/search?q=${encodeURIComponent(query)}`);
+        const url = new URL('http://localhost:4000/search');
+        url.searchParams.append('q', query);
+        url.searchParams.append('startYear', startYear);
+        url.searchParams.append('endYear', endYear);
+        const response = await fetch(url);
 
         if (!response.ok) {
           const errorData = await response.json();
@@ -62,7 +69,7 @@ function App() {
     };
 
     fetchTimelineData();
-  }, [query]);
+  }, [query, startYear, endYear]);
 
   const getSideImages = (side) => {
     const filteredImages = images.filter(img => img && img.src)
@@ -80,7 +87,12 @@ function App() {
       <Header />
       <h1 className="app-title">Timeline Search</h1>
 
-      <SearchBar onSearch={setQuery} />
+      <SearchBar onSearch={({ query, startYear, endYear }) => {
+        setQuery(query);
+        setStartYear(startYear);
+        setEndYear(endYear);
+        }} 
+      />
 
       {query && (
         <p className="search-query-display">
@@ -141,14 +153,14 @@ function App() {
             )}
         </div>
       
-    <div className="side-column">
-      <TimelineImages images={getSideImages('right')} />
+      <div className="side-column">
+        <TimelineImages images={getSideImages('right')} />
+      </div>
     </div>
-  </div>
-)}
+    )}
 
       <Footer />
-    </div>
+  </div>
   );
 }
 

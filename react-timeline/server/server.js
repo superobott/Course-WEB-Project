@@ -43,22 +43,28 @@ async function generateTimelineFromGemini(text) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-      You are an expert historian and timeline creator, focused on extracting all significant historical events.
+      You are an expert historian and timeline creator, focused on extracting all historical events.
       Please provide ONLY a JSON array of events in this exact format:
 
       [
-        { "date": "Month YYYY", "summary": "Detailed summary (at least two lines describing the event's significance and key details)." },
+        { "date": "YYYY", "summary": "Simple 1–3 line summary in plain language that explains the event's importance and key facts." },
         ...
       ]
 
-      Analyze the following text and extract ALL important historical events. For each event, provide the date in "Month YYYY" format and a comprehensive summary of at least two lines. The summary should explain the event's significance and include key details.
+      Analyze the following text and extract ALL important historical events. For each event, provide the date in one of these formats ONLY:
+      - "YYYY" (e.g., "2020", "1945")
+      - "YYYY BC" (e.g., "1000 BC", "44 BC")
 
-      IMPORTANT:
-      - Do NOT write "AD" for modern dates. Just write "Month YYYY".
+      STRICT RULES:
+      - Do NOT use months, centuries, decades, or vague time periods (e.g., "May 2020", "7th century", "1800s", "the 20th century", "the 1990s", "ancient times", etc.).
+      - Every date must be a specific year, and for BCE use "BC" after the year.
+      - Do NOT write "AD" for modern dates. Just write "YYYY".
       - Use "BC" only if the event happened before the common era.
-      - The date must always be in the format "Month YYYY".
+      - The date must always be in one of the formats above.
+      - The summary must be written in simple, clear language that a high school student could easily understand.
 
-      Text:"""${text}"""`;
+      Text:"""${text}"""
+    `;
 
     const result = await model.generateContent(prompt);
     const rawText = result.response.text();
@@ -84,6 +90,8 @@ async function generateTimelineFromGemini(text) {
     return [];
   }
 }
+
+// Function to fetch images from Unsplash based on the query
 async function fetchUnsplashImages(query) {
   const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${UNSPLASH_ACCESS_KEY}&per_page=20`;
 
@@ -97,7 +105,7 @@ async function fetchUnsplashImages(query) {
     }
 
     const fetchedImages = data.results.map((img) => ({
-      src: img.urls.small,  // את יכולה לשנות ל-regular או full אם את רוצה איכות גבוהה יותר
+      src: img.urls.small,  
       alt: img.alt_description || `Image of ${query}`,
     }));
 
@@ -112,27 +120,56 @@ async function fetchUnsplashImages(query) {
 
 // Function to sort timeline events by date
 function sortTimelineEvents(events) {
-        return events.sort((a, b) => {
-        const dateA = new Date(a.date);
-        const dateB = new Date(b.date);
-        return dateA - dateB;
-       });
+  return events.sort((a, b) => {
+    const yearA = extractYear(a.date);
+    const yearB = extractYear(b.date);
+    if (yearA === null && yearB === null) return 0;
+    if (yearA === null) return -1;
+    if (yearB === null) return 1;
+    return yearA - yearB;
+  });
 }
+
+function extractYear(dateStr) {
+  if (!dateStr) return null;
+  const bcMatch = dateStr.match(/(?:[A-Za-z]+\s)?(\d{1,4})\s*BC/i);
+  if (bcMatch) return -parseInt(bcMatch[1]);
+  const adMatch = dateStr.match(/(?:[A-Za-z]+\s)?(\d{3,4})$/);
+  if (adMatch) return parseInt(adMatch[1]);
+  return null;
+}
+
+function filterTimelineEventsByYear(events, startYear, endYear) {
+  return events.filter(event => {
+    const year = extractYear(event.date);
+    if (year === null) return false;
+    return year >= startYear && year <= endYear;
+  });
+}
+
 //Routes
 app.get('/search', async (req, res) => {
   const query = req.query.q;
+  const startYear = extractYear(req.query.startYear);
+  const endYear = extractYear(req.query.endYear);
 
   if (!query) {
     return res.status(400).json({ error: 'Query parameter "q" is required.' });
   }
 
   try {
-    const cachedData = await TimelineModel.findOne({ query: query.toLowerCase() });
+    let cachedData = await TimelineModel.findOne({ query: query.toLowerCase() });
     if (cachedData) {
       console.log(`Found "${query}" in DB.`);
+
+      let filteredEvents = cachedData.timelineEvents;
+      if (startYear !== null && endYear !== null) {
+        filteredEvents = filterTimelineEventsByYear(filteredEvents, startYear, endYear);
+      }
+
       return res.json({
         extract: cachedData.fullText,
-        timelineEvents: cachedData.timelineEvents,
+        timelineEvents: filteredEvents,
         images: cachedData.images,
         source: 'cache'
       });
@@ -155,9 +192,10 @@ app.get('/search', async (req, res) => {
       fullText = page.extract || 'No extract available from Wikipedia.';
       timelineEvents = await generateTimelineFromGemini(fullText);
       timelineEvents = sortTimelineEvents(timelineEvents);
+      timelineEvents = timelineEvents.filter(event => extractYear(event.date) !== null);
       images = await fetchUnsplashImages(query); 
       console.log(`Gemini generated ${timelineEvents.length} events.`);
-      console.log(`Found ${images.length} images from Wikipedia.`);
+      console.log(`Found ${images.length} images`);
     }
 
     const newTimelineEntry = new TimelineModel({
@@ -170,9 +208,14 @@ app.get('/search', async (req, res) => {
     await newTimelineEntry.save();
     console.log(`Saved "${query}" to DB.`);
 
+    let filteredEvents = timelineEvents;
+    if (startYear !== null && endYear !== null) {
+      filteredEvents = filterTimelineEventsByYear(timelineEvents, startYear, endYear);
+    }
+
     return res.json({
       extract: fullText,
-      timelineEvents,
+      timelineEvents: filteredEvents,
       images, 
       source: 'wikipedia + gemini'
     });

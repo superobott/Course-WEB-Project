@@ -1,43 +1,45 @@
 .search-bar-form {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 10px; /* מרווח קטן יותר בין האלמנטים */
-  margin-top: 25px; /* מרווח עליון מעט קטן יותר */
-  width: 100%;
-  max-width: 500px; /* רוחב מקסימלי קטן יותר לסרגל החיפוש */
-  padding: 0 15px; /* ריווח פנימי מהצדדים */
+  gap: 15px; 
+  max-width: 500px;  
   box-sizing: border-box;
+}
+.search-term{
+  display: flex;
+  width: 100%; 
 }
 
 .search-bar-form input[type="text"] {
   flex-grow: 1;
-  padding: 10px 15px; /* ריווח פנימי קטן יותר לתיבת הטקסט */
+  padding: 10px 15px; 
   border: 2px solid #006A71;
-  border-radius: 8px; /* פינות מעוגלות פחות */
-  font-size: 1rem; /* גודל גופן סטנדרטי יותר */
+  border-radius: 8px; 
+  font-size: 1rem; 
   color: #374151;
   outline: none;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
   transition: all 0.3s ease;
 }
 
 .search-bar-form input[type="text"]:focus {
   border-color: #2563eb;
-  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); /* צל זוהר עדין יותר בריכוז */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2); 
 }
 
 .search-bar-form button {
   background-color: #006A71;
   color: #ffffff;
-  padding: 10px 20px; /* ריווח פנימי קטן יותר לכפתור */
+  padding: 10px 20px; 
   border: none;
-  border-radius: 8px; /* פינות מעוגלות פחות */
-  font-size: 1rem; /* גודל גופן סטנדרטי יותר */
+  border-radius: 8px; 
+  font-size: 1rem; 
   font-weight: bold;
   cursor: pointer;
   transition: background-color 0.3s ease, transform 0.2s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); 
 }
 
 .search-bar-form button:hover {
@@ -48,4 +50,28 @@
 .search-bar-form button:active {
   transform: translateY(0);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.year-range {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+
+}
+
+.year-range input[type="text"] {
+  flex: 1; 
+  padding: 10px 15px;
+  border: 2px solid #006A71;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #374151;
+  outline: none;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: all 0.3s ease;
+}
+
+.year-range input[type="text"]:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
 }

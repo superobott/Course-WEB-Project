@@ -2,6 +2,7 @@ body {
   margin: 0;
   font-family: Arial, sans-serif;
   background-color: #F2EFE7;
+  overflow-x: auto;
 }
 
 .app-container {
@@ -9,6 +10,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+ 
 }
 
 .app-title {
@@ -93,7 +95,7 @@ body {
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
-  max-height: 100%; /* גובה דינמי */
+  max-height: 100%; 
 }
 
 @media (max-width: 1024px) {
