@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import SearchBar from './components/searchBar';
-import TimelineEvent from './components/TimelineEvent';
-import Header from './components/Header';
-import Footer from './components/Footer';
-import TimelineImages from './components/TimelineImages';
+import SearchBar from './components/logic/searchBar';
+import TimelineEvent from './components/logic/TimelineEvent';
+import Header from './components/logic/Header';
+import Footer from './components/logic/Footer';
+import TimelineImages from './components/logic/TimelineImages';
 import './App.css'; 
 
 
