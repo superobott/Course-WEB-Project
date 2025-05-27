@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
-
+const UNSPLASH_ACCESS_KEY = process.env.UNSPLASH_ACCESS_KEY;
 const app = express();
 const port = 4000;
 
@@ -43,15 +43,20 @@ async function generateTimelineFromGemini(text) {
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const prompt = `
-      You are an expert historian and timeline creator.
+      You are an expert historian and timeline creator, focused on extracting all significant historical events.
       Please provide ONLY a JSON array of events in this exact format:
 
       [
-      { "date": "1905", "summary": "Detailed description" },
-      ...
+        { "date": "Month YYYY", "summary": "Detailed summary (at least two lines describing the event's significance and key details)." },
+        ...
       ]
 
-      Analyze the following text and extract all relevant historical events, with detailed summaries.
+      Analyze the following text and extract ALL important historical events. For each event, provide the date in "Month YYYY" format and a comprehensive summary of at least two lines. The summary should explain the event's significance and include key details.
+
+      IMPORTANT:
+      - Do NOT write "AD" for modern dates. Just write "Month YYYY".
+      - Use "BC" only if the event happened before the common era.
+      - The date must always be in the format "Month YYYY".
 
       Text:"""${text}"""`;
 
@@ -79,85 +84,40 @@ async function generateTimelineFromGemini(text) {
     return [];
   }
 }
-
-async function fetchWikipediaImages(query) {
-  // Step 1: Get titles of all images on the page
-  const imagesQueryUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=images&titles=${encodeURIComponent(query)}&format=json&imlimit=50`; // imlimit to fetch up to 50 images
+async function fetchUnsplashImages(query) {
+  const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&client_id=${UNSPLASH_ACCESS_KEY}&per_page=20`;
 
   try {
-    const imagesResponse = await fetch(imagesQueryUrl);
-    const imagesData = await imagesResponse.json();
+    const response = await fetch(url);
+    const data = await response.json();
 
-    const pageId = Object.keys(imagesData.query.pages)[0];
-    const page = imagesData.query.pages[pageId];
-
-    if (!page || !page.images || page.images.length === 0) {
-      console.log(`No images found for page "${query}" using prop=images.`);
+    if (!data.results || data.results.length === 0) {
+      console.log(`No images found on Unsplash for "${query}".`);
       return [];
     }
 
-    // Filter out common non-visual files or unwanted file types based on title
-    const imageTitles = page.images
-      .filter(img =>
-        img.title &&
-        !img.title.startsWith('File:Sound-icon') &&
-        !img.title.startsWith('File:Commons-logo') && // Exclude Commons logo
-        !img.title.startsWith('File:OOjs UI icon') &&  // Exclude OOjs icons
-        !img.title.toLowerCase().includes('svg') &&    // Generally exclude SVG files (often icons/charts)
-        !img.title.toLowerCase().includes('gif') &&    // Optionally exclude GIFs
-        !img.title.toLowerCase().includes('flag') &&   // Optionally exclude flag icons
-        !img.title.toLowerCase().includes('seal') &&   // Optionally exclude seals/emblems
-        !img.title.toLowerCase().includes('map')       // Optionally exclude maps
-      )
-      .map(img => img.title);
+    const fetchedImages = data.results.map((img) => ({
+      src: img.urls.small,  // את יכולה לשנות ל-regular או full אם את רוצה איכות גבוהה יותר
+      alt: img.alt_description || `Image of ${query}`,
+    }));
 
-    if (imageTitles.length === 0) {
-      console.log(`No valid image titles extracted after initial filtering for "${query}".`);
-      return [];
-    }
-
-    // Step 2: Get image URLs for these titles using prop=imageinfo
-    // Ensure you fetch enough image info for all titles if the list is long
-    const imageInfoQueryUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url|size|mime&titles=${imageTitles.map(encodeURIComponent).join('|')}&format=json&iiurlwidth=300`; // iiurlwidth for thumbnail size, adjust as needed
-
-    const imageInfoResponse = await fetch(imageInfoQueryUrl);
-    const imageInfoData = await imageInfoResponse.json();
-
-    const fetchedImages = [];
-    if (imageInfoData.query && imageInfoData.query.pages) {
-      for (const pId in imageInfoData.query.pages) {
-        const imgPage = imageInfoData.query.pages[pId];
-        if (imgPage.imageinfo && imgPage.imageinfo.length > 0) {
-          const info = imgPage.imageinfo[0];
-          // Further filter based on MIME type, actual URL, and size/dimensions if available
-          if (
-            info.url &&
-            info.mime &&
-            info.mime.startsWith('image/') &&
-            (info.mime === 'image/jpeg' || info.mime === 'image/png' || info.mime === 'image/webp') && // Prioritize common image formats
-            info.width > 50 && info.height > 50 // Filter out very small images/icons (adjust pixel values)
-          ) {
-            fetchedImages.push({
-              src: info.url,
-              alt: imgPage.title.replace('File:', '') || 'Image',
-              // Add width/height if you want to use them in your frontend's TimelineImages component
-              // width: info.width,
-              // height: info.height,
-            });
-          }
-        }
-      }
-    }
-
-    console.log(`Successfully fetched ${fetchedImages.length} relevant images for "${query}".`);
+    console.log(`Fetched ${fetchedImages.length} images from Unsplash for "${query}".`);
     return fetchedImages;
 
   } catch (error) {
-    console.error('Error fetching Wikipedia images:', error);
+    console.error("Error fetching images from Unsplash:", error);
     return [];
   }
 }
 
+// Function to sort timeline events by date
+function sortTimelineEvents(events) {
+        return events.sort((a, b) => {
+        const dateA = new Date(a.date);
+        const dateB = new Date(b.date);
+        return dateA - dateB;
+       });
+}
 //Routes
 app.get('/search', async (req, res) => {
   const query = req.query.q;
@@ -194,7 +154,8 @@ app.get('/search', async (req, res) => {
     } else {
       fullText = page.extract || 'No extract available from Wikipedia.';
       timelineEvents = await generateTimelineFromGemini(fullText);
-      images = await fetchWikipediaImages(query); 
+      timelineEvents = sortTimelineEvents(timelineEvents);
+      images = await fetchUnsplashImages(query); 
       console.log(`Gemini generated ${timelineEvents.length} events.`);
       console.log(`Found ${images.length} images from Wikipedia.`);
     }

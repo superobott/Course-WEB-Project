@@ -11,7 +11,6 @@ const TimelineImages = ({ images }) => {
       {images.map((image, index) => (
         <div key={index} className="timeline-image-item">
           <img src={image.src} alt={image.alt} />
-          {image.alt && <p className="image-caption">{image.alt}</p>}
         </div>
       ))}
     </div>

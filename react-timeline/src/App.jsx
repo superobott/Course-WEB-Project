@@ -99,57 +99,54 @@ function App() {
           <p>{error}</p>
         </div>
       )}
-
       {!loading && !error && query && (
         <div className="app-content-wrapper"> 
-          {images && images.length > 0 && ( 
-            <div className="timeline-images-left">
-              <TimelineImages images={getSideImages('left')} />
-            </div>
-          )}
+          <div className="side-column">
+            <TimelineImages images={getSideImages('left')} />
+          </div>
 
-          {fullText ? (
-            <div className="results-container">
-              <h2 className="results-title">
-                {`Results for "${query}" `}
-                {source && <span className="source-text">({source})</span>}
-              </h2>
-              <details className="full-text-details">
-                <summary className="full-text-summary">Show Wikipedia summary</summary>
-                <p className="full-text-display">{fullText}</p>
-              </details>
+          <div className="main-column">
+            {fullText ? (
+              <div className="results-container">
+                <h2 className="results-title">
+                  {`Results for "${query}" `}
+                  {source && <span className="source-text">({source})</span>}
+                </h2>
+                <details className="full-text-details">
+                  <summary className="full-text-summary">Show Wikipedia summary</summary>
+                  <p className="full-text-display">{fullText}</p>
+                </details>
 
-              {timelineEvents.length > 0 ? (
-                <div className="timeline-events-container">
-                  {timelineEvents.map((event, index) => (
-                    <TimelineEvent
-                      key={index}
-                      date={event.date}
-                      summary={event.summary}
-                      index={index}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <p className="no-events-message">
-                  No specific timeline events found for "{query}" in the extract.
-                </p>
-              )}
-            </div>
-          ) : (
-            <p className="no-data-message">
-              No data found on Wikipedia for "{query}". Please try a different search term.
-            </p>
-          )}
-
-          {/* Right Column for Images */}
-          {images && images.length > 0 && ( // Explicit check for images array and its length
-            <div className="timeline-images-right">
-              <TimelineImages images={getSideImages('right')} />
-            </div>
-          )}
+                {timelineEvents.length > 0 ? (
+                  <div className="timeline-events-container">
+                    {timelineEvents.map((event, index) => (
+                      <TimelineEvent
+                        key={index}
+                        date={event.date}
+                        summary={event.summary}
+                        index={index}
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <p className="no-events-message">
+                    No specific timeline events found for "{query}" in the extract.
+                  </p>
+                )}
+              </div>
+            ) : (
+              <p className="no-data-message">
+                No data found on Wikipedia for "{query}". Please try a different search term.
+              </p>
+            )}
         </div>
-      )}
+      
+    <div className="side-column">
+      <TimelineImages images={getSideImages('right')} />
+    </div>
+  </div>
+)}
+
       <Footer />
     </div>
   );
