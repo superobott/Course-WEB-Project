@@ -17,7 +17,7 @@
   z-index: 0;
 }
 
-/* כל אירוע */
+
 .timeline-event {
   position: relative;
   width: 50%;
@@ -25,19 +25,17 @@
   box-sizing: border-box;
 }
 
-/* אירוע בצד שמאל */
+
 .timeline-event.left {
   left: 0;
   text-align: right;
 }
 
-/* אירוע בצד ימין */
 .timeline-event.right {
   left: 50%;
   text-align: left;
 }
 
-/* תוכן האירוע */
 .timeline-event .content {
   background-color: #fff;
   padding: 15px;
@@ -47,7 +45,7 @@
   z-index: 1;
 }
 
-/* העיגול */
+
 .timeline-event::before {
   content: '';
   position: absolute;
@@ -80,8 +78,8 @@
   padding: 10px 15px;
   transition: background-color 0.3s ease, transform 0.2s ease;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-  width: 160px;         /* קובע רוחב קבוע */
-  text-align: center;   /* ממרכז את הטקסט בתוך הכפתור */
+  width: 160px;        
+  text-align: center;   
   display: inline-block;
 }
 
