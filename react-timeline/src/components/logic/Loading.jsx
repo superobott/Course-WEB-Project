@@ -1,3 +1,5 @@
+import '../style/Loading.css';
+
 export default function Loading({ query }) {
   return (
     <>

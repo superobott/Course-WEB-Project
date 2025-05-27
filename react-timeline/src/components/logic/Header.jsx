@@ -1,3 +1,5 @@
+import '../style/Header.css';
+
 function Header() {
   return (
     <header className="header flex justify-between items-center px-8">

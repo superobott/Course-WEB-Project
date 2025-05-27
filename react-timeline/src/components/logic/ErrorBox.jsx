@@ -1,3 +1,5 @@
+import '../style/ErrorBox.css';
+
 export default function ErrorBox({ error }) {
   return (
     <div className="error-box">

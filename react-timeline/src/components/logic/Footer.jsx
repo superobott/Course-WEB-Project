@@ -1,3 +1,5 @@
+import '../style/Footer.css';
+
 function Footer() {
   return (
     <footer className="footer text-center text-sm">

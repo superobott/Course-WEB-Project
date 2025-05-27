@@ -1,0 +1,14 @@
+.error-box {
+  margin-top: 32px;
+  padding: 16px;
+  background-color: #fee2e2;
+  border: 1px solid #ef4444;
+  color: #b91c1c;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.error-title {
+  font-weight: bold;
+  margin-bottom: 4px;
+}

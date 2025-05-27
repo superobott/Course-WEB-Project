@@ -81,3 +81,14 @@
   margin-top: 8px;
   font-size: 1rem;
 }
+
+.search-query-display {
+  margin-top: 16px;
+  font-size: 1.25rem;
+  color: #00285f;
+}
+
+.query-text {
+  font-weight: 600;
+  color: hsl(221, 98%, 32%);
+}

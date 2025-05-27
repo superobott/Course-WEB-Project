@@ -1,5 +1,6 @@
 import TimelineEvent from './TimelineEvent';
 import TimelineImages from './TimelineImages';
+import '../style/Results.css';
 
 export default function Results({
   query,
