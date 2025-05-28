@@ -22,3 +22,19 @@ USAGE INSTRUCTIONS
    • On the Home page, locate the search input.
    • Type **flight** and hit Enter (or click the search button).
    • Any entries containing “flight” in your fake‑data array should appear.
+
+6. Running React Timeline Component
+   • Navigate to the react-timeline folder:
+     ```
+     cd react-timeline
+     ```
+   • Install dependencies:
+     ```
+     npm install
+     ```
+   • Start the development server:
+     ```
+     npm start
+     ```
+   • The React application will open automatically in your browser at:
+     http://localhost:3000

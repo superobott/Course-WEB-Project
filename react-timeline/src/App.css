@@ -12,6 +12,8 @@ body {
   flex-direction: column;
   align-items: center;
   box-sizing: border-box;
+  width: 100%;
+  padding: 0 20px;
 }
 
 .app-title {
@@ -19,7 +21,9 @@ body {
   font-weight: 800;
   color: #006A71;
   margin-bottom: 32px;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+  text-shadow: 6px 6px 4px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 100%;
 }
 
 .search-query-display {

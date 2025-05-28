@@ -6,12 +6,111 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const fetch = require('node-fetch');
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+const jwt = require('jsonwebtoken');
+const User = require('./models/User');
 
 const app = express();
 const port = 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
+
+// JWT Secret - should be in .env file in production
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+
+// Authentication middleware
+const auth = async (req, res, next) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    if (!token) {
+      throw new Error('No token provided');
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    req.user = user;
+    next();
+  } catch (error) {
+    res.status(401).json({ error: 'Please authenticate' });
+  }
+};
+
+// Auth routes
+app.post('/api/register', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    
+    console.log('Attempting to register user:', { username, email });
+    
+    // Check if user already exists
+    const existingUser = await User.findOne({ 
+      $or: [{ email }, { username }] 
+    });
+    
+    if (existingUser) {
+      console.log('Registration failed: User already exists');
+      return res.status(400).json({ 
+        error: 'User with this email or username already exists' 
+      });
+    }
+
+    const user = new User({ username, email, password });
+    await user.save();
+    console.log('User registered successfully:', { id: user._id, username: user.username, email: user.email });
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+    
+    res.status(201).json({ 
+      message: 'User created successfully',
+      token,
+      user: { id: user._id, username: user.username, email: user.email }
+    });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    console.log('Attempting login for user:', { email });
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      console.log('Login failed: User not found');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      console.log('Login failed: Invalid password');
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET);
+    console.log('User logged in successfully:', { id: user._id, username: user.username, email: user.email });
+    
+    res.json({ 
+      token,
+      user: { id: user._id, username: user.username, email: user.email }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Protected route example
+app.get('/api/profile', auth, async (req, res) => {
+  res.json(req.user);
+});
 
 //connection to GEMINI API
 if (!process.env.GEMINI_API_KEY) {
@@ -117,8 +216,7 @@ async function fetchWikipediaImages(query) {
     }
 
     // Step 2: Get image URLs for these titles using prop=imageinfo
-    // Ensure you fetch enough image info for all titles if the list is long
-    const imageInfoQueryUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url|size|mime&titles=${imageTitles.map(encodeURIComponent).join('|')}&format=json&iiurlwidth=300`; // iiurlwidth for thumbnail size, adjust as needed
+    const imageInfoQueryUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=imageinfo&iiprop=url|size|mime&titles=${imageTitles.map(encodeURIComponent).join('|')}&format=json&iiurlwidth=300`; // iiurlwidth for thumbnail size
 
     const imageInfoResponse = await fetch(imageInfoQueryUrl);
     const imageInfoData = await imageInfoResponse.json();
@@ -129,20 +227,17 @@ async function fetchWikipediaImages(query) {
         const imgPage = imageInfoData.query.pages[pId];
         if (imgPage.imageinfo && imgPage.imageinfo.length > 0) {
           const info = imgPage.imageinfo[0];
-          // Further filter based on MIME type, actual URL, and size/dimensions if available
+          // Further filter based on MIME type, actual URL, and size/dimensions
           if (
             info.url &&
             info.mime &&
             info.mime.startsWith('image/') &&
             (info.mime === 'image/jpeg' || info.mime === 'image/png' || info.mime === 'image/webp') && // Prioritize common image formats
-            info.width > 50 && info.height > 50 // Filter out very small images/icons (adjust pixel values)
+            info.width > 50 && info.height > 50 // Filter out very small images/icons
           ) {
             fetchedImages.push({
               src: info.url,
-              alt: imgPage.title.replace('File:', '') || 'Image',
-              // Add width/height if you want to use them in your frontend's TimelineImages component
-              // width: info.width,
-              // height: info.height,
+              alt: imgPage.title.replace('File:', '') || 'Image'
             });
           }
         }

@@ -3,7 +3,7 @@
   justify-content: center;
   align-items: center;
   gap: 10px; /* מרווח קטן יותר בין האלמנטים */
-  margin-top: 25px; /* מרווח עליון מעט קטן יותר */
+  margin: 25px auto; /* Changed to auto for horizontal centering */
   width: 100%;
   max-width: 500px; /* רוחב מקסימלי קטן יותר לסרגל החיפוש */
   padding: 0 15px; /* ריווח פנימי מהצדדים */
@@ -20,6 +20,7 @@
   outline: none;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* צל עדין יותר */
   transition: all 0.3s ease;
+  min-width: 0; /* Prevents input from overflowing */
 }
 
 .search-bar-form input[type="text"]:focus {
