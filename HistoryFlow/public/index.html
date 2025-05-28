@@ -1,40 +1,136 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Timeline History - home</title>
-    <link rel="stylesheet" href="/HistoryFlow/src/output.css">
-    <link rel="stylesheet" href="/HistoryFlow/src/styles/index.css">
-    <script src="../src/logic/index.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Login to HistoryFlow to explore interactive historical timelines and events." />
+  
+  <!-- Open Graph Tags -->
+  <meta property="og:title" content="HistoryFlow - Login" />
+  <meta property="og:description" content="Access your HistoryFlow account to explore interactive historical timelines and events." />
+  <meta property="og:image" content="/HistoryFlow/assets/images/historyflow-social.jpg" />
+  <meta property="og:url" content="historyflow.example.com/index.html" />
+  <meta property="og:type" content="website" />
+  
+  <!-- Security Headers -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';" />
+  
+  <title>HistoryFlow – Login</title>
+  
+  <!-- External CSS -->
+  <link rel="stylesheet" href="/HistoryFlow/src/styles/index.css">
+  <link rel="stylesheet" href="/HistoryFlow/src/styles/main.css">
+  <!-- Login Script -->
+  <script src="/HistoryFlow/src/logic/index.js" defer></script>
 </head>
-<body class="bg-[#F2EFE7] text-[#006A71] min-h-screen flex flex-col">
-    <!-- Header Section -->
-    <header class="bg-[#006A71] text-[#F2EFE7] py-6">
-        <div class="container mx-auto text-center">
-            <h1 class="text-4xl font-bold">Welcome to HistoryFlow</h1>
-            <p class="text-lg mt-2">Discover historical events, timelines, and more!</p>
-        </div>
-    </header>
+<body>
+  <!-- Header Section -->
+  <header class="header">
+    <div class="container text-center">
+      <div class="logo-container">
+        <img src="/HistoryFlow/assets/images/logo-blue.png" alt="HistoryFlow Logo" width="150" height="50" class="logo" loading="lazy">
+      </div>
+      <h1 class="header-title">HistoryFlow</h1>
+      <p class="header-subtitle">Explore the timeline of history</p>
+    </div>
+  </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow">
-        <section class="py-12 text-center">
-            <h2 class="text-3xl font-semibold mb-4">Explore History</h2>
-            <p class="text-gray-600 mb-6">Start your journey by logging in or registering.</p>
-            <div class="flex justify-center gap-4">
-                <a href="login.html" class="base-button">Login</a>
-                <a href="register.html" class="base-button">Register</a>
+  <!-- Login Form Section -->
+  <main class="main-content">
+    <section class="form-section">
+      <div class="container card">
+        <!-- Rate Limit Alert (Hidden by Default) -->
+        <div id="rateLimitNotice" class="alert-box alert-error hidden">
+          Too many failed attempts. Please try again in <span id="cooldownTimer">30</span> seconds.
+        </div>
+        
+        <h2 class="form-title">Login to Your Account</h2>
+        
+        <form id="loginForm" class="form-container" action="/api/auth/login" method="POST">
+          <!-- CSRF Token and Honeypot -->
+          <input type="hidden" id="csrfToken" name="csrfToken" value="">
+          <div class="honeypot-field">
+            <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+          </div>
+          
+          <!-- Error Container -->
+          <div id="errorContainer" class="alert-box alert-error hidden" role="alert" aria-live="polite"></div>
+          
+          <!-- Email Field -->
+          <div class="form-group">
+            <label for="email" class="form-label">Email Address</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              class="form-input"
+              placeholder="your@email.com"
+              required
+              autocomplete="email"
+              aria-describedby="emailError"
+              autofocus
+            />
+            <div id="emailError" class="error-message" role="alert" hidden></div>
+          </div>
+          
+          <!-- Password Field -->
+          <div class="form-group">
+            <label for="password" class="form-label">Password</label>
+            <div class="password-container">
+              <input
+                type="password"
+                id="password"
+                name="password"
+                class="form-input"
+                placeholder="••••••••"
+                required
+                autocomplete="current-password"
+                aria-describedby="passwordError"
+              />
+              <button type="button" id="togglePassword" class="password-toggle" aria-label="Show password">
+                <span class="eye-icon">👁️</span>
+              </button>
             </div>
-        </section>
-    </main>
-
-    <!-- Footer Section -->
-    <footer class="bg-[#006A71] text-[#F2EFE7] py-4 mt-auto">
-        <div class="container mx-auto text-center">
-            <p>&copy; 2025 Timeline History Website. All rights reserved.</p>
+            <div id="passwordError" class="error-message" role="alert" hidden></div>
+          </div>
+          
+          <!-- Forgot Password Link -->
+          <div class="link-container">
+            <a href="forgot_password.html" class="link">Forgot password?</a>
+          </div>
+          
+          <!-- Submit Button -->
+          <div class="button-container">
+            <button 
+              type="submit" 
+              id="loginButton"
+              aria-label="Login to account"
+              class="btn btn-primary">
+              <span>Login</span>
+              <div class="spinner hidden"></div>
+            </button>
+          </div>
+        </form>
+        
+        <!-- Success/Error Message Banner -->
+        <div id="messageBanner" class="alert-box hidden" role="alert"></div>
+        
+        <!-- Register Link -->
+        <div class="login-link-container">
+          <a href="register.html" class="login-link" aria-label="Go to registration page">
+            New here? Register
+          </a>
         </div>
-    </footer>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer Section -->
+  <footer class="footer">
+    <div class="container text-center">
+      <p>&copy; 2025 HistoryFlow. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>

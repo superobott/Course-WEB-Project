@@ -1,9 +1,7 @@
-<!-- register.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <!--מאפשר עיצוב רספונסיבי במכשירים ניידים-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Join HistoryFlow to explore historical events and timelines. Create your account today.">
     
@@ -14,10 +12,17 @@
     <meta property="og:url" content="historyflow.example.com/register.html">
     <meta property="og:type" content="website">
     
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self';" />
+    
     <title>HistoryFlow - Register</title>
     
     <!-- Main stylesheet -->
     <link rel="stylesheet" href="/HistoryFlow/src/styles/register.css">
+    <link rel="stylesheet" href="/HistoryFlow/src/styles/main.css">
+
+    <!-- Main registration script -->
+    <script src="/HistoryFlow/src/logic/register.js" defer></script>
 </head>
 <body>
     <!-- Header Section -->
@@ -53,24 +58,36 @@
                     <div class="honeypot-field">
                         <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
                     </div>
-                    
-                    <!-- Username field -->
+
+                    <!-- Full Name Fields -->
                     <div class="form-group">
-                        <label for="name" class="form-label">Username</label>
+                        <label for="firstName" class="form-label">First Name</label>
                         <input 
                             type="text" 
-                            id="name"
-                            name="username" 
-                            placeholder="Choose a username" 
+                            id="firstName"
+                            name="firstName" 
+                            placeholder="Enter your first name" 
                             class="form-input" 
                             required
-                            minlength="3"
-                            maxlength="30"
-                            autocomplete="username"
-                            aria-describedby="nameRequirements nameError"
+                            autocomplete="given-name"
+                            aria-describedby="firstNameError"
                         >
-                        <div id="nameRequirements" class="input-requirements">3-30 characters, letters and numbers only</div>
-                        <div id="nameError" class="error-message" role="alert" hidden></div>
+                        <div id="firstNameError" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input 
+                            type="text" 
+                            id="lastName"
+                            name="lastName" 
+                            placeholder="Enter your last name" 
+                            class="form-input" 
+                            required
+                            autocomplete="family-name"
+                            aria-describedby="lastNameError"
+                        >
+                        <div id="lastNameError" class="error-message" role="alert" hidden></div>
                     </div>
                     
                     <!-- Email field -->
@@ -140,6 +157,38 @@
                         </div>
                         <div id="confirmPasswordError" class="error-message" role="alert" hidden></div>
                     </div>
+
+                    <!-- Security Question Fields -->
+                    <div class="form-group">
+                        <label for="securityQuestion" class="form-label">Security Question</label>
+                        <select
+                            id="securityQuestion"
+                            name="securityQuestion"
+                            class="form-input"
+                            required
+                            aria-describedby="securityQuestionError"
+                        >
+                            <option value="">Select a security question</option>
+                            <option value="pet">What was your first pet's name?</option>
+                            <option value="city">In which city were you born?</option>
+                            <option value="school">What was the name of your first school?</option>
+                        </select>
+                        <div id="securityQuestionError" class="error-message" role="alert" hidden></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="securityAnswer" class="form-label">Security Answer</label>
+                        <input
+                            type="text"
+                            id="securityAnswer"
+                            name="securityAnswer"
+                            class="form-input"
+                            required
+                            placeholder="Enter your answer"
+                            aria-describedby="securityAnswerError"
+                        >
+                        <div id="securityAnswerError" class="error-message" role="alert" hidden></div>
+                    </div>
                     
                     <!-- GDPR Consent -->
                     <div class="form-group checkbox-group">
@@ -188,7 +237,7 @@
                 </form>
                 
                 <div class="login-link-container">
-                    <a href="login.html" class="login-link" aria-label="Go to login page">
+                    <a href="index.html" class="login-link" aria-label="Go to login page">
                         Already have an account? Log in
                     </a>
                 </div>
@@ -200,11 +249,6 @@
     <footer class="footer">
         <div class="container text-center">
             <p>&copy; 2025 HistoryFlow. All rights reserved.</p>
-            <div class="footer-links">
-                <a href="/terms.html">Terms</a>
-                <a href="/privacy.html">Privacy</a>
-                <a href="/contact.html">Contact</a>
-            </div>
         </div>
     </footer>
     
@@ -218,8 +262,5 @@
         "description": "Interactive historical timelines and events exploration"
     }
     </script>
-    
-    <!-- Main registration script -->
-    <script src="register.js"></script>
 </body>
 </html>

@@ -136,6 +136,11 @@ function displayTimelineData(data) {
                 <p class="text-gray-600">${event.description}</p>
             `;
 
+            // Add click event to open popup
+            eventBox.addEventListener('click', () => {
+                openPopup(event);
+            });
+
             eventItem.appendChild(eventBox);
             eventsList.appendChild(eventItem);
         });
@@ -146,4 +151,29 @@ function displayTimelineData(data) {
 
     timelineWrapper.appendChild(timelineContainer);
     resultsList.appendChild(timelineWrapper);
+}
+
+// Function to open the popup window
+function openPopup(event) {
+    // Create the popup container
+    const popupContainer = document.createElement('div');
+    popupContainer.classList.add('popup-container');
+
+    // Create the popup content
+    const popupContent = document.createElement('div');
+    popupContent.classList.add('popup-content');
+    popupContent.innerHTML = `
+        <button class="popup-close">&times;</button>
+        <h2>${event.title}</h2>
+        <p><strong>Category:</strong> ${event.category}</p>
+        <p>${event.description}</p>
+    `;
+
+    // Add close functionality
+    popupContent.querySelector('.popup-close').addEventListener('click', () => {
+        popupContainer.remove();
+    });
+
+    popupContainer.appendChild(popupContent);
+    document.body.appendChild(popupContainer);
 }

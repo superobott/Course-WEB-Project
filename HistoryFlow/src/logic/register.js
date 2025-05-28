@@ -1,8 +1,7 @@
-// register.js
 /**
  * HistoryFlow Registration Page JavaScript
  * Enhanced for accessibility, security, and UX
- * @version 1.0.2
+ * @version 1.0.5
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -12,10 +11,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Store form elements
     const registerForm = document.getElementById('registerForm');
-    const nameInput = document.getElementById('name');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmPassword');
+    const securityQuestionInput = document.getElementById('securityQuestion');
+    const securityAnswerInput = document.getElementById('securityAnswer');
     const gdprConsentCheckbox = document.getElementById('gdprConsent');
     const registerButton = document.getElementById('registerButton');
     const togglePasswordBtn = document.getElementById('togglePassword');
@@ -40,7 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initCaptcha();
     
     // Focus the first input on page load for accessibility
-    nameInput.focus();
+    firstNameInput.focus();
     
     // Password toggle visibility functionality
     togglePasswordBtn.addEventListener('click', function() {
@@ -82,23 +84,16 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Check if user already exists in localStorage
-        const username = nameInput.value.trim();
+        // Get user data
+        const firstName = firstNameInput.value.trim();
+        const lastName = lastNameInput.value.trim();
         const email = emailInput.value.trim();
         
         // Get existing users or initialize empty array
         let users = JSON.parse(localStorage.getItem('users')) || [];
         
         // Check for existing users
-        const usernameExists = users.some(user => user.name.toLowerCase() === username.toLowerCase());
         const emailExists = users.some(user => user.email.toLowerCase() === email.toLowerCase());
-        
-        if (usernameExists) {
-            showGlobalError('Username already exists. Please choose a different username.');
-            hideLoadingState();
-            nameInput.focus();
-            return;
-        }
         
         if (emailExists) {
             showGlobalError('Email already exists. Please use a different email or login.');
@@ -109,11 +104,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Create user object - in a real app, you would hash the password
         const user = {
-            name: username,
+            firstName: firstName,
+            lastName: lastName,
+            fullName: `${firstName} ${lastName}`.trim(),
             email: email,
             password: passwordInput.value, // NEVER store plain passwords in production
+            securityQuestion: securityQuestionInput.value,
+            securityAnswer: securityAnswerInput.value,
             registerDate: new Date().toISOString(),
-            gdprConsent: gdprConsentCheckbox.checked
+            gdprConsent: gdprConsentCheckbox.checked,
+            id: generateUserId(),
+            bio: '',
+            interests: [],
+            searchHistory: [],
+            savedTimelines: [],
+            profileImage: null
         };
         
         // Add new user to array
@@ -126,7 +131,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 localStorage.setItem('users', JSON.stringify(users));
                 
                 // Log registration success (in production, send to analytics)
-                logEvent('registration_success', { username });
+                logEvent('registration_success', { email });
                 
                 // Hide form and show success message
                 registerForm.hidden = true;
@@ -134,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Redirect to login page after delay
                 setTimeout(function() {
-                    window.location.href = 'login.html';
+                    window.location.href = 'index.html';
                 }, 2000);
             } catch (error) {
                 // Handle errors (localStorage full, etc)
@@ -146,7 +151,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Input event listeners to clear errors when user types
-    const allInputs = [nameInput, emailInput, passwordInput, confirmPasswordInput];
+    const allInputs = [firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput, securityQuestionInput, securityAnswerInput];
     allInputs.forEach(input => {
         input.addEventListener('input', function() {
             clearError(input);
@@ -286,15 +291,15 @@ document.addEventListener('DOMContentLoaded', function() {
     function validateAllFields() {
         let isValid = true;
         
-        // Validate username
-        if (nameInput.value.trim() === '') {
-            showError(nameInput, 'Please enter your username');
+        // Validate first name
+        if (!firstNameInput.value.trim()) {
+            showError(firstNameInput, 'Please enter your first name');
             isValid = false;
-        } else if (nameInput.value.trim().length < 3) {
-            showError(nameInput, 'Username must be at least 3 characters');
-            isValid = false;
-        } else if (!/^[a-zA-Z0-9_]+$/.test(nameInput.value.trim())) {
-            showError(nameInput, 'Username can only contain letters, numbers, and underscores');
+        }
+        
+        // Validate last name
+        if (!lastNameInput.value.trim()) {
+            showError(lastNameInput, 'Please enter your last name');
             isValid = false;
         }
         
@@ -320,6 +325,18 @@ document.addEventListener('DOMContentLoaded', function() {
             isValid = false;
         }
         
+        // Validate security question
+        if (!securityQuestionInput.value) {
+            showError(securityQuestionInput, 'Please select a security question');
+            isValid = false;
+        }
+        
+        // Validate security answer
+        if (!securityAnswerInput.value.trim()) {
+            showError(securityAnswerInput, 'Please enter your security answer');
+            isValid = false;
+        }
+        
         // Validate GDPR consent
         if (!gdprConsentCheckbox.checked) {
             showCheckboxError(gdprConsentCheckbox, 'You must consent to the data storage policy');
@@ -335,8 +352,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function focusFirstInvalidField() {
         // Find first input with an error message
         const invalidInputs = [
-            nameInput, emailInput, passwordInput, confirmPasswordInput,
-            gdprConsentCheckbox
+            firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput,
+            securityQuestionInput, securityAnswerInput, gdprConsentCheckbox
         ].filter(input => {
             const errorId = `${input.id}Error`;
             const errorElement = document.getElementById(errorId);
@@ -423,8 +440,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function clearAllErrors() {
         // Clear field-specific errors
         const allInputsAndCheckboxes = [
-            nameInput, emailInput, passwordInput, confirmPasswordInput,
-            gdprConsentCheckbox
+            firstNameInput, lastNameInput, emailInput, passwordInput, confirmPasswordInput,
+            securityQuestionInput, securityAnswerInput, gdprConsentCheckbox
         ];
         
         allInputsAndCheckboxes.forEach(input => {
@@ -498,6 +515,14 @@ document.addEventListener('DOMContentLoaded', function() {
      */
     function generateCSRFToken() {
         return 'csrf-' + Math.random().toString(36).substring(2, 15);
+    }
+    
+    /**
+     * Generate a unique user ID
+     * @returns {string} A unique user ID
+     */
+    function generateUserId() {
+        return 'user_' + Math.random().toString(36).substring(2, 9);
     }
     
     /**
