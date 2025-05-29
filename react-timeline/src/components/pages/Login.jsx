@@ -25,7 +25,7 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/login', {
+      const response = await fetch('http://localhost:4000/api/users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -35,9 +35,10 @@ const Login = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Store the token in localStorage
-        localStorage.setItem('token', data.token);
+      if (response.ok && data.success) {
+        // Store user info in localStorage
+        localStorage.setItem('userId', data.userId);
+        localStorage.setItem('userEmail', data.email);
         // Redirect to search page after successful login
         navigate('/search');
       } else {

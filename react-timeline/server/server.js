@@ -18,6 +18,9 @@ mongoose.connect('mongodb://localhost:27017/Timeline')
 
 // Use routes
 const timelineRoutes = require('./routes/timelineRoutes');
+const userRoutes = require('./routes/userRoutes');
+
+app.use('/api/users', userRoutes);
 app.use('/', timelineRoutes);
 
 app.listen(port, () => {
