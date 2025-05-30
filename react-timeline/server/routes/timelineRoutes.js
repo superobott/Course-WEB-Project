@@ -3,8 +3,23 @@ const router = express.Router();
 const TimelineModel = require('../models/TimelineModel');
 const { generateTimelineFromGemini } = require('../utils/gemini');
 const { fetchUnsplashImages } = require('../utils/unsplash');
+const Search = require('../models/SearchModel');
 const { sortTimelineEvents, extractYear, filterTimelineEventsByYear } = require('../utils/timelineUtils');
 const fetch = require('node-fetch');
+
+
+// Get all searches
+router.get('/api/timeline/searches', async (req, res) => {
+  try {
+    console.log('Fetching all searches from MongoDB...'); // Debug log
+    const searches = await Search.find().sort({ createdAt: -1 });
+    console.log(`Found ${searches.length} searches`); // Debug log
+    res.json(searches);
+  } catch (err) {
+    console.error('Error fetching searches:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
 
 //Routes
 router.get('/search', async (req, res) => {

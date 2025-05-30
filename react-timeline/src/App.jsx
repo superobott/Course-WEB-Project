@@ -4,6 +4,7 @@ import Index from './components/pages/Index';
 import Login from './components/pages/Login';
 import Register from './components/pages/Register';
 import Search from './components/pages/Search';
+import Profile from './components/pages/Profile';
 import './App.css';
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<Search />} />
         <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );

@@ -13,15 +13,35 @@ app.use(bodyParser.json());
 
 // Connect to MongoDB
 mongoose.connect('mongodb://localhost:27017/Timeline')
-  .then(() => console.log('MongoDB connected successfully'))
+  .then(() => {
+    console.log('MongoDB connected successfully');
+    // Debug: Check if we can access the searches collection
+    mongoose.connection.db.collection('searches').countDocuments()
+      .then(count => {
+        console.log(`Number of documents in searches collection: ${count}`);
+      });
+  })
   .catch(err => console.error('MongoDB connection error:', err));
 
 // Use routes
 const timelineRoutes = require('./routes/timelineRoutes');
 const userRoutes = require('./routes/userRoutes');
 
+app.get('/searches', async (req, res) => {
+  try {
+    const searches = await mongoose.connection.db.collection('searches').find({}).toArray();
+    console.log('Fetched searches:', searches.length);
+    res.json(searches);
+  } catch (err) {
+    console.error('Error fetching searches:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 app.use('/api/users', userRoutes);
 app.use('/', timelineRoutes);
+// Debug route to check searches
+
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
