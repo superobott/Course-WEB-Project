@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Header from '../logic/Header';
+import Footer from '../logic/Footer';
 import '../style/Profile.css';
 
 const Profile = () => {
@@ -118,9 +119,9 @@ const handleSubmit = async (e) => {
 
   return (
     <>
+    <div className="profile-main-container">
       <Header />
       <div className="profile-container">
-        {/* Add return button here, before the title */}
         <div className="profile-header">
           <button onClick={() => navigate('/search')} className="return-button">
             Return to Search
@@ -142,9 +143,12 @@ const handleSubmit = async (e) => {
                 <span>********</span>
               </div>
             </div>
+            <div className="buttons">
+            
             <button onClick={() => setIsEditing(true)} className="edit-button">
               Edit Profile
             </button>
+            </div>
           </>
         ) : (
           <form onSubmit={handleSubmit} className="edit-form">
@@ -189,8 +193,7 @@ const handleSubmit = async (e) => {
             </form>
 
         )}
-      </div>
-            <div className="search-history">
+        <div className="search-history">
             <h3>Search History ({searches.length})</h3> {/* Added count */}
             {!searches || searches.length === 0 ? (
             <p>No searches yet</p>
@@ -208,10 +211,12 @@ const handleSubmit = async (e) => {
             </div>
             )}
         </div>
+      </div>
+      <Footer />      
+      </div>
     </>
     );
 };
-
 
 
 export default Profile;

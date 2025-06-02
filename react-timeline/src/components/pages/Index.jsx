@@ -40,9 +40,8 @@ const Index = () => {
           <p>Discover historical events and timelines through our interactive search platform.</p>
           <p>Login to access your personalized timeline searches or register to get started!</p>
         </div>
-
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }
