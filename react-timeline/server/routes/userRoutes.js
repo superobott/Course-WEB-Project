@@ -1,8 +1,8 @@
 const express = require('express');
 const User = require('../models/UserModel');
 const router = express.Router();
-const Search = require('../models/SearchModel'); // Add this line
-
+const Search = require('../models/SearchModel'); 
+const LoggedInUser = require('../models/LoggedInUserModel');
 
 // Register new user
 router.post('/register', async (req, res) => {
@@ -94,7 +94,8 @@ router.get('/searches/:userId', async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 });
-// ...existing code...
+
+
 // Login user
 router.post('/login', async (req, res) => {
   try {
@@ -105,11 +106,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    // Direct password comparison since we're not using hashing
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
+    await LoggedInUser.create({ email });
     res.json({ 
       success: true,
       userId: user._id,
@@ -120,4 +121,18 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Error logging in' });
   }
 });
+
+// Logout user
+router.post('/logout', async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log('Logout request for:', email);
+    await LoggedInUser.deleteOne({ email });
+    res.json({ success: true, message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ message: 'Error logging out' });
+  }
+});
+
 module.exports = router;

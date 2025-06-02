@@ -5,31 +5,53 @@ const profileImage = "data:image/svg+xml,%3Csvg width='32' height='32'  viewBox=
 
 function Header() {
   const navigate = useNavigate();
+  const isLoggedIn = !!localStorage.getItem('userEmail');
 
   const handleProfileClick = () => {
     navigate('/profile');
   };
 
+  const handleLogout = async () => {
+    const email = localStorage.getItem('userEmail');
+    console.log('Logging out:', email);
+    if (email) {
+      await fetch('http://localhost:4000/api/users/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      });
+      localStorage.removeItem('userId');
+      localStorage.removeItem('userEmail');
+      navigate('/login');
+    }
+  };
+
   return (
-    <header className="header flex justify-between items-center px-8">
-      <div className="text-3xl font-bold">Welcome to HistoryFlow</div>
-      <div className="text-2xl">
+    <header className="header">
+    <div className="header-center">
+        Welcome to HistoryFlow
+      </div>
+      <div className="header-left">
         <button 
           onClick={handleProfileClick}
           className="profile-button"
         >
-         <img 
+          <img 
             src={profileImage}
             alt="Profile" 
             className="w-8 h-8 rounded-full"
-            style={{
-              background: 'white',
-              border: '1px solid #ccc',
-              padding: '2px',
-              objectFit: 'cover'
-            }}
           />
         </button>
+      </div>
+      <div className="header-right">
+        {isLoggedIn && (
+          <button 
+            onClick={handleLogout}
+            className="logout-button"
+          >
+            Logout
+          </button>
+        )}
       </div>
     </header>
   );
