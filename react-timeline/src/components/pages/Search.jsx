@@ -5,7 +5,7 @@ import SearchBar from '../logic/searchBar';
 import Results from '../logic/Results';
 import Loading from '../logic/Loading';
 import ErrorBox from '../logic/ErrorBox';
-import '../../App.css';
+import '../style/Search.css';
 
 const Search = () => {
   const [query, setQuery] = useState('');

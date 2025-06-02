@@ -5,7 +5,7 @@ import Login from './components/pages/Login';
 import Register from './components/pages/Register';
 import Search from './components/pages/Search';
 import Profile from './components/pages/Profile';
-import './App.css';
+
 
 function App() {
   return (
@@ -15,8 +15,8 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<Search />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
