@@ -2,10 +2,33 @@
   width: 100%;
   background-color: #006A71;
   color: #F2EFE7;
-  padding: 20px 0;
-  text-align: center;
+  padding: 20px 40px;
+  display: flex;
   font-size: 2rem;
   font-weight: 700;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   user-select: none;
+  position: relative;
+}
+
+.header div:first-child {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.profile-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  color: #F2EFE7;
+  font-size: 1.2rem;
+  margin-left: auto;
+}
+
+.profile-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
 }
