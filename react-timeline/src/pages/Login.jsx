@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../logic/Header';
-import Footer from '../logic/Footer';
-import '../style/index.css';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
+import '../style/pagestyle/index.css';
 
 const Login = () => {
   const navigate = useNavigate();

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Index from './components/pages/Index';
-import Login from './components/pages/Login';
-import Register from './components/pages/Register';
-import Search from './components/pages/Search';
-import Profile from './components/pages/Profile';
+import Index from './pages/Index';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Search from './pages/Search';
+import Profile from './pages/Profile';
 
 
 function App() {

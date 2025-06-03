@@ -1,5 +1,5 @@
 import React from 'react';
-import '../style/TimelineImages.css'; 
+import '../../style/componentsStyle/TimelineImages.css';
 
 const TimelineImages = ({ images }) => {
   if (!images || images.length === 0) {

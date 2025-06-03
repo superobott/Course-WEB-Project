@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../logic/Header';
-import Footer from '../logic/Footer';
-import '../style/Profile.css';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
+import '../style/pagestyle/Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
