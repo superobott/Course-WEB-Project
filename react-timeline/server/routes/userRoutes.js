@@ -8,8 +8,6 @@ const LoggedInUser = require('../models/LoggedInUserModel');
 router.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
@@ -53,8 +51,6 @@ router.put('/profile/:userId', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
-    // Update email if provided
     if (email) {
       const emailExists = await User.findOne({ email, _id: { $ne: req.params.userId } });
       if (emailExists) {
@@ -103,11 +99,9 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-
     await LoggedInUser.create({ email });
     res.json({ 
       success: true,
@@ -123,7 +117,7 @@ router.post('/login', async (req, res) => {
 // Logout user
 router.post('/logout', async (req, res) => {
   try {
-    const { email } = req.body;
+    const { email } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     console.log('Logout request for:', email);
     await LoggedInUser.deleteOne({ email });
     res.json({ success: true, message: 'Logged out successfully' });
