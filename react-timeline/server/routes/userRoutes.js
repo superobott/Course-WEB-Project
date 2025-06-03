@@ -15,7 +15,6 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user
     const user = new User({
       email,
       password
@@ -64,9 +63,8 @@ router.put('/profile/:userId', async (req, res) => {
       user.email = email;
     }
 
-    // Update password if provided - store as plain text
     if (password) {
-      user.password = password; // Store password directly without hashing
+      user.password = password; 
     }
 
     await user.save();
@@ -83,11 +81,11 @@ router.put('/profile/:userId', async (req, res) => {
 // Get user searches
 router.get('/searches/:userId', async (req, res) => {
   try {
-    console.log('Fetching searches from MongoDB...'); // Debug log
-    const searches = await Search.find()  // Remove any filters to get all searches
-      .sort({ createdAt: -1 });    // Sort by newest first
+    console.log('Fetching searches from MongoDB...');
+    const searches = await Search.find()  
+      .sort({ createdAt: -1 });   
     
-    console.log('Found searches:', searches); // Debug log
+    console.log('Found searches:', searches); 
     res.json(searches);
   } catch (err) {
     console.error('Search fetch error:', err);

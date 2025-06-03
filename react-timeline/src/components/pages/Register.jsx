@@ -12,6 +12,7 @@ const Register = () => {
     confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -45,8 +46,10 @@ const Register = () => {
       const data = await response.json();
 
       if (response.ok) {
-        // Redirect to login page after successful registration
-        navigate('/login');
+        setSuccess(true); 
+        setTimeout(() => {
+          navigate('/login');
+        }, 1500);
       } else {
         setError(data.message || 'Registration failed');
       }
@@ -61,6 +64,7 @@ const Register = () => {
       <div className="form-container">
         <h2>Create an Account</h2>
         {error && <div className="error-message">{error}</div>}
+        {success && <div className="success-message">Registration successful! Redirecting to login...</div>}
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <label htmlFor="email">Email:</label>

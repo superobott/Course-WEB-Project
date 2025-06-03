@@ -22,7 +22,7 @@ function Header() {
       });
       localStorage.removeItem('userId');
       localStorage.removeItem('userEmail');
-      navigate('/login');
+      navigate('/');
     }
   };
 
