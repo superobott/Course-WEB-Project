@@ -86,7 +86,6 @@ const handleSubmit = async (e) => {
       localStorage.setItem('userEmail', formData.email);
       setSuccess('Profile updated successfully');
       setIsEditing(false);
-      // Reset password fields
       setFormData(prev => ({
         ...prev,
         newPassword: '',
@@ -104,6 +103,7 @@ const handleSubmit = async (e) => {
   if (!userEmail) {
     return (
       <>
+       <div className="profile-main-container">
         <Header />
         <div className="profile-container">
           <div className="error-message">
@@ -112,6 +112,8 @@ const handleSubmit = async (e) => {
               Go to Login
             </button>
           </div>
+        </div>
+        <Footer /> 
         </div>
       </>
     );
@@ -194,7 +196,7 @@ const handleSubmit = async (e) => {
 
         )}
         <div className="search-history">
-            <h3>Search History ({searches.length})</h3> {/* Added count */}
+            <h3>Search History ({searches.length})</h3> 
             {!searches || searches.length === 0 ? (
             <p>No searches yet</p>
             ) : (
