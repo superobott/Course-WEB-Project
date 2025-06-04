@@ -1,21 +1,18 @@
 const express = require('express');
 const User = require('../models/UserModel');
 const router = express.Router();
-const Search = require('../models/SearchModel'); // Add this line
-
+const Search = require('../models/SearchModel'); 
+const LoggedInUser = require('../models/LoggedInUserModel');
 
 // Register new user
 router.post('/register', async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    // Create new user
     const user = new User({
       email,
       password
@@ -54,8 +51,6 @@ router.put('/profile/:userId', async (req, res) => {
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-
-    // Update email if provided
     if (email) {
       const emailExists = await User.findOne({ email, _id: { $ne: req.params.userId } });
       if (emailExists) {
@@ -64,9 +59,8 @@ router.put('/profile/:userId', async (req, res) => {
       user.email = email;
     }
 
-    // Update password if provided - store as plain text
     if (password) {
-      user.password = password; // Store password directly without hashing
+      user.password = password; 
     }
 
     await user.save();
@@ -83,18 +77,19 @@ router.put('/profile/:userId', async (req, res) => {
 // Get user searches
 router.get('/searches/:userId', async (req, res) => {
   try {
-    console.log('Fetching searches from MongoDB...'); // Debug log
-    const searches = await Search.find()  // Remove any filters to get all searches
-      .sort({ createdAt: -1 });    // Sort by newest first
+    console.log('Fetching searches from MongoDB...');
+    const searches = await Search.find()  
+      .sort({ createdAt: -1 });   
     
-    console.log('Found searches:', searches); // Debug log
+    console.log('Found searches:', searches); 
     res.json(searches);
   } catch (err) {
     console.error('Search fetch error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
-// ...existing code...
+
+
 // Login user
 router.post('/login', async (req, res) => {
   try {
@@ -104,12 +99,10 @@ router.post('/login', async (req, res) => {
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-
-    // Direct password comparison since we're not using hashing
     if (password !== user.password) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
-
+    await LoggedInUser.create({ email });
     res.json({ 
       success: true,
       userId: user._id,
@@ -120,4 +113,18 @@ router.post('/login', async (req, res) => {
     res.status(500).json({ message: 'Error logging in' });
   }
 });
+
+// Logout user
+router.post('/logout', async (req, res) => {
+  try {
+    const { email } = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    console.log('Logout request for:', email);
+    await LoggedInUser.deleteOne({ email });
+    res.json({ success: true, message: 'Logged out successfully' });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({ message: 'Error logging out' });
+  }
+});
+
 module.exports = router;

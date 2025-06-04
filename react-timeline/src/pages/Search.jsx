@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import Header from '../logic/Header';
-import Footer from '../logic/Footer';
-import SearchBar from '../logic/searchBar';
-import Results from '../logic/Results';
-import Loading from '../logic/Loading';
-import ErrorBox from '../logic/ErrorBox';
-import '../../App.css';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
+import SearchBar from '../components/timeline/searchBar';
+import Results from '../components/timeline/Results';
+import Loading from '../components/common/Loading';
+import ErrorBox from '../components/common/ErrorBox';
+import '../style/pagestyle/Search.css';
 
 const Search = () => {
   const [query, setQuery] = useState('');

@@ -40,15 +40,16 @@
 
 @media (min-width: 1024px) {
   .timeline-images-right {
-    grid-column: 3; /* Place in the third column */
+    grid-column: 3; 
     padding-left: 60px
   }
   .timeline-images-left {
-    grid-column: 1; /* Place in the first column */
+    grid-column: 1; 
     padding-right: 60px;
   }
   .results-container {
-    grid-column: 2; /* Place main content in the second column */
+    grid-column: 2; 
   }
 
 }
+

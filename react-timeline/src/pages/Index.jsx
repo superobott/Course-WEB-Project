@@ -1,8 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../logic/Header';
-import Footer from '../logic/Footer';
-import '../style/index.css';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
+import '../style/pagestyle/index.css';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -40,9 +40,8 @@ const Index = () => {
           <p>Discover historical events and timelines through our interactive search platform.</p>
           <p>Login to access your personalized timeline searches or register to get started!</p>
         </div>
-
-        <Footer />
       </div>
+      <Footer />
     </div>
   );
 }

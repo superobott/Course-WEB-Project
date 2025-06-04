@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Header from '../logic/Header';
-import '../style/Profile.css';
+import Header from '../components/common/Header';
+import Footer from '../components/common/Footer';
+import '../style/pagestyle/Profile.css';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -85,7 +86,6 @@ const handleSubmit = async (e) => {
       localStorage.setItem('userEmail', formData.email);
       setSuccess('Profile updated successfully');
       setIsEditing(false);
-      // Reset password fields
       setFormData(prev => ({
         ...prev,
         newPassword: '',
@@ -103,6 +103,7 @@ const handleSubmit = async (e) => {
   if (!userEmail) {
     return (
       <>
+       <div className="profile-main-container">
         <Header />
         <div className="profile-container">
           <div className="error-message">
@@ -112,15 +113,17 @@ const handleSubmit = async (e) => {
             </button>
           </div>
         </div>
+        <Footer /> 
+        </div>
       </>
     );
   }
 
   return (
     <>
+    <div className="profile-main-container">
       <Header />
       <div className="profile-container">
-        {/* Add return button here, before the title */}
         <div className="profile-header">
           <button onClick={() => navigate('/search')} className="return-button">
             Return to Search
@@ -142,9 +145,12 @@ const handleSubmit = async (e) => {
                 <span>********</span>
               </div>
             </div>
+            <div className="buttons">
+            
             <button onClick={() => setIsEditing(true)} className="edit-button">
               Edit Profile
             </button>
+            </div>
           </>
         ) : (
           <form onSubmit={handleSubmit} className="edit-form">
@@ -189,9 +195,8 @@ const handleSubmit = async (e) => {
             </form>
 
         )}
-      </div>
-            <div className="search-history">
-            <h3>Search History ({searches.length})</h3> {/* Added count */}
+        <div className="search-history">
+            <h3>Search History ({searches.length})</h3> 
             {!searches || searches.length === 0 ? (
             <p>No searches yet</p>
             ) : (
@@ -208,10 +213,12 @@ const handleSubmit = async (e) => {
             </div>
             )}
         </div>
+      </div>
+      <Footer />      
+      </div>
     </>
     );
 };
-
 
 
 export default Profile;

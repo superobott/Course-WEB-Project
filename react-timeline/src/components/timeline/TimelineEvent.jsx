@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import '../style/TimelineEvent.css';
+import '../../style/componentsStyle/TimelineEvent.css';
 
 const TimelineEvent = ({ date, summary, index }) => {
   const [showSummary, setShowSummary] = useState(false);
