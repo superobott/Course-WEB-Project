@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import SearchBar from '../components/timeline/searchBar';
@@ -8,6 +9,7 @@ import ErrorBox from '../components/common/ErrorBox';
 import '../style/pagestyle/Search.css';
 
 const Search = () => {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [fullText, setFullText] = useState('');
   const [timelineEvents, setTimelineEvents] = useState([]);
@@ -16,17 +18,39 @@ const Search = () => {
   const [error, setError] = useState(null);
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
+  const [searchHistory, setSearchHistory] = useState([]);
+  const userId = localStorage.getItem('userId');
 
+  // Fetch search history
   useEffect(() => {
-    if (!query) {
-      setFullText('');
-      setTimelineEvents([]);
-      setImages([]);
-      setError(null);
-      return;
-    }
+    const fetchSearchHistory = async () => {
+      if (!userId) return;
+      
+      try {
+        const response = await fetch(`http://localhost:4000/api/users/search-history/${userId}`);
+        if (response.ok) {
+          const history = await response.json();
+          setSearchHistory(history);
+        }
+      } catch (err) {
+        console.error('Failed to fetch search history:', err);
+      }
+    };
 
+    fetchSearchHistory();
+  }, [userId]);
+
+  // Handle search
+  useEffect(() => {
     const fetchTimelineData = async () => {
+      if (!query) {
+        setFullText('');
+        setTimelineEvents([]);
+        setImages([]);
+        setError(null);
+        return;
+      }
+
       setLoading(true);
       setError(null);
       setFullText('');
@@ -34,22 +58,57 @@ const Search = () => {
       setImages([]);
 
       try {
-        const url = new URL('http://localhost:4000/search');
-        url.searchParams.append('q', query);
-        url.searchParams.append('startYear', startYear);
-        url.searchParams.append('endYear', endYear);
-        const response = await fetch(url);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Something went wrong on the server.');
+        const userEmail = localStorage.getItem('userEmail');
+        if (!userEmail) {
+          navigate('/login');
+          return;
         }
 
-        const data = await response.json();
-        console.log('Data received from server:', data);
+        const searchUrl = new URL('http://localhost:4000/search');
+        searchUrl.searchParams.append('q', query);
+        searchUrl.searchParams.append('startYear', startYear);
+        searchUrl.searchParams.append('endYear', endYear);
+        
+        const searchResponse = await fetch(searchUrl, {
+          headers: { 'user-email': userEmail }
+        });
+
+        if (searchResponse.status === 401) {
+          navigate('/login');
+          return;
+        }
+
+        if (!searchResponse.ok) {
+          throw new Error('Failed to fetch search results');
+        }
+
+        const data = await searchResponse.json();
+        
+        // Save search to user's history
+        if (userId) {
+          try {
+            const historyResponse = await fetch('http://localhost:4000/api/users/search-history', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                userId,
+                query
+              }),
+            });
+            
+            if (historyResponse.ok) {
+              const updatedHistory = await historyResponse.json();
+              setSearchHistory(updatedHistory);
+            }
+          } catch (historyError) {
+            console.error('Failed to update search history:', historyError);
+          }
+        }
 
         setFullText(data.extract);
-        setTimelineEvents(data.timelineEvents);
+        setTimelineEvents(data.timelineEvents || []);
         setImages(data.images || []);
       } catch (err) {
         console.error('Fetch error:', err);
@@ -63,17 +122,19 @@ const Search = () => {
     };
 
     fetchTimelineData();
-  }, [query, startYear, endYear]);
+  }, [query, startYear, endYear, navigate, userId]);
 
   const getSideImages = (side) => {
     const filteredImages = images.filter(img => img && img.src);
     if (filteredImages.length === 0) return [];
     const half = Math.ceil(filteredImages.length / 2);
-    if (side === 'left') {
-      return filteredImages.slice(0, half);
-    } else {
-      return filteredImages.slice(half);
-    }
+    return side === 'left' ? filteredImages.slice(0, half) : filteredImages.slice(half);
+  };
+
+  const handleSearch = ({ query: newQuery, startYear: newStartYear, endYear: newEndYear }) => {
+    setQuery(newQuery);
+    setStartYear(newStartYear);
+    setEndYear(newEndYear);
   };
 
   return (
@@ -81,11 +142,26 @@ const Search = () => {
       <Header />
       <h1 className="app-title">Timeline Search</h1>
 
-      <SearchBar onSearch={({ query, startYear, endYear }) => {
-        setQuery(query);
-        setStartYear(startYear);
-        setEndYear(endYear);
-      }} />
+      <div className="search-section">
+        <SearchBar onSearch={handleSearch} />
+        
+        {searchHistory.length > 0 && (
+          <div className="search-history">
+            <h3>Recent Searches</h3>
+            <ul>
+              {searchHistory.map((term, index) => (
+                <li key={index} onClick={() => handleSearch({ 
+                  query: term,
+                  startYear: '',
+                  endYear: ''
+                })}>
+                  {term}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
 
       {loading && query && <Loading query={query} />}
       {error && <ErrorBox error={error} />}
@@ -103,6 +179,6 @@ const Search = () => {
       <Footer />
     </div>
   );
-}
+};
 
 export default Search;
