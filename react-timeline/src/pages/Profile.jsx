@@ -16,39 +16,50 @@ const Profile = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [searches, setSearches] = useState([]);
-  // Add this useEffect to fetch searches
-useEffect(() => {
-  const fetchSearches = async () => {
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [searchError, setSearchError] = useState('');
+  
+  useEffect(() => {
+    const fetchSearchHistory = async () => {
+      try {
+        if (!userId) return;
+        
+        const response = await fetch(`http://localhost:4000/api/users/search-history/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch search history');
+        }
+        
+        const data = await response.json();
+        setSearchHistory(data);
+      } catch (err) {
+        console.error('Error fetching search history:', err);
+        setSearchError('Failed to load search history');
+      }
+    };
+
+    fetchSearchHistory();
+  }, [userId]);
+
+  const handleDeleteSearch = async (searchId) => {
     try {
-      console.log('Fetching searches...'); // Debug log
-      // Update the endpoint to match the timeline route
-      const response = await fetch('http://localhost:4000/api/timeline/searches');
-      
+      const response = await fetch(`http://localhost:4000/api/users/search-history/${userId}/${searchId}`, {
+        method: 'DELETE'
+      });
+
       if (!response.ok) {
-        console.error('Server response:', response.status);
-        throw new Error('Network response was not ok');
+        throw new Error('Failed to delete search');
       }
-      
-      const data = await response.json();
-      console.log('Raw search data:', data); // Debug log
-      
-      // Update how we handle the data based on the response structure
-      if (data) {
-        setSearches(Array.isArray(data) ? data : [data]);
-        console.log('Searches set:', Array.isArray(data) ? data.length : 1, 'items');
-      } else {
-        console.error('No data received from server');
-        setSearches([]);
-      }
+
+      setSearchHistory(prev => prev.filter(item => item.searchId._id !== searchId));
     } catch (err) {
-      console.error('Error fetching searches:', err);
-      setSearches([]);
+      console.error('Error deleting search:', err);
+      setSearchError('Failed to delete search');
     }
   };
 
-  fetchSearches();
-}, []);
+  const handleRerunSearch = (query) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -196,22 +207,42 @@ const handleSubmit = async (e) => {
 
         )}
         <div className="search-history">
-            <h3>Search History ({searches.length})</h3> 
-            {!searches || searches.length === 0 ? (
+          <h3>Search History ({searchHistory.length})</h3>
+          {searchError && <div className="error-message">{searchError}</div>}
+          {!searchHistory || searchHistory.length === 0 ? (
             <p>No searches yet</p>
-            ) : (
+          ) : (
             <div className="search-list">
-                {searches.map((search) => (
-                <div key={search._id} className="search-item">
-                    <h4>Search Query: {search.query || 'No query'}</h4>
-                    <p className="search-text">{search.fullText || 'No text available'}</p>
-                    <p className="search-date">
-                    Searched on: {new Date(search.createdAt).toLocaleString()}
-                    </p>
+              {searchHistory.map((historyItem) => (
+                <div key={historyItem.searchId._id} className="search-item">
+                  <div className="search-item-header">
+                    <h4>Search Query: {historyItem.query}</h4>
+                    <div className="search-actions">
+                      <button 
+                        onClick={() => handleRerunSearch(historyItem.query)}
+                        className="rerun-button"
+                      >
+                        Re-run Search
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteSearch(historyItem.searchId._id)}
+                        className="delete-button"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                  <p className="search-date">
+                    Searched on: {new Date(historyItem.createdAt).toLocaleString()}
+                  </p>
+                  <div className="search-metadata">
+                    <p>Timeline Events: {historyItem.searchId.timelineEvents.length}</p>
+                    <p>Images: {historyItem.searchId.images.length}</p>
+                  </div>
                 </div>
-                ))}
+              ))}
             </div>
-            )}
+          )}
         </div>
       </div>
       <Footer />      

@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const TimelineModel = require('../models/TimelineModel');
+const User = require('../models/UserModel');
+const requireAuthentication = require('../utils/requireAuthentication');
 const { generateTimelineFromGemini } = require('../utils/gemini');
-const { fetchUnsplashImages } = require('../utils/unsplash');
+const { fetchUnsplashImages } = require('../utils/fetchTimelineImages');
 const Search = require('../models/SearchModel');
 const { sortTimelineEvents, extractYear, filterTimelineEventsByYear } = require('../utils/timelineUtils');
 const fetch = require('node-fetch');
@@ -22,7 +25,7 @@ router.get('/api/timeline/searches', async (req, res) => {
 });
 
 //Routes
-router.get('/search', async (req, res) => {
+router.get('/search', requireAuthentication, async (req, res) => {
   const query = req.query.q;
   const startYearInput = req.query.startYear;
   const endYearInput = req.query.endYear;
@@ -83,15 +86,60 @@ router.get('/search', async (req, res) => {
       console.log(`Found ${images.length} images`);
     }
 
-    const newTimelineEntry = new TimelineModel({
-      query: query.toLowerCase(),
-      fullText,
-      timelineEvents,
-      images,
-    });
+    // Start a MongoDB session for the transaction
+    const session = await mongoose.startSession();
+    let newSearch;
+    
+    try {
+      await session.withTransaction(async () => {
+        // Save search in Search collection within the transaction
+        newSearch = new Search({
+          query: query.toLowerCase(),
+          fullText,
+          timelineEvents,
+          images,
+          userId: req.user._id,
+          createdAt: new Date()
+        });
+        
+        await newSearch.save({ session });
 
-    await newTimelineEntry.save();
-    console.log(`Saved "${query}" to DB.`);
+        // Update user's search history atomically within the same transaction
+        const updatedUser = await User.findByIdAndUpdate(
+          req.user._id,
+          {
+            $push: {
+              searchHistory: {
+                $each: [{
+                  query: query,
+                  searchId: newSearch._id,
+                  createdAt: new Date()
+                }],
+                $position: 0, // Add at the beginning of the array
+                $slice: 100 // Keep only the last 100 searches
+              }
+            }
+          },
+          { 
+            new: true, 
+            runValidators: true,
+            session 
+          }
+        );
+
+        if (!updatedUser) {
+          throw new Error('Failed to update user search history');
+        }
+
+        console.log('Updated search history:', updatedUser.searchHistory);
+        console.log(`Saved "${query}" to user's search history`);
+      });
+    } catch (error) {
+      console.error('Transaction failed:', error);
+      throw error;
+    } finally {
+      await session.endSession();
+    }
 
     let filteredEvents = timelineEvents;
     if (startYear !== null && endYear !== null) {

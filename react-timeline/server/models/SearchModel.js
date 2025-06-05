@@ -5,6 +5,10 @@ const searchSchema = new mongoose.Schema({
   fullText: String,
   timelineEvents: Array,
   images: Array,
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   createdAt: {
     type: Date,
     default: Date.now

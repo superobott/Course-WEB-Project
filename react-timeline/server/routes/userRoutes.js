@@ -15,7 +15,8 @@ router.post('/register', async (req, res) => {
 
     const user = new User({
       email,
-      password
+      password,
+      searchHistory: []  // Initialize empty search history array
     });
 
     await user.save();
@@ -74,17 +75,44 @@ router.put('/profile/:userId', async (req, res) => {
   }
 });
 
-// Get user searches
-router.get('/searches/:userId', async (req, res) => {
+// Get user's search history
+router.get('/search-history/:userId', async (req, res) => {
   try {
-    console.log('Fetching searches from MongoDB...');
-    const searches = await Search.find()  
-      .sort({ createdAt: -1 });   
-    
-    console.log('Found searches:', searches); 
-    res.json(searches);
+    const user = await User.findById(req.params.userId)
+      .populate({
+        path: 'searchHistory.searchId',
+        model: 'Search',
+        select: 'query fullText timelineEvents images createdAt'
+      });
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.json(user.searchHistory);
   } catch (err) {
-    console.error('Search fetch error:', err);
+    console.error('Search history fetch error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// Delete search from history
+router.delete('/search-history/:userId/:searchId', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Remove from user's search history
+    user.searchHistory = user.searchHistory.filter(
+      search => search.searchId.toString() !== req.params.searchId
+    );
+    await user.save();
+
+    res.json({ message: 'Search removed from history' });
+  } catch (err) {
+    console.error('Delete search error:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });
