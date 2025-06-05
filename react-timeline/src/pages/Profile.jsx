@@ -10,100 +10,96 @@ const Profile = () => {
   const userId = localStorage.getItem('userId');
   const [isEditing, setIsEditing] = useState(false);  
   const [formData, setFormData] = useState({
-    email: userEmail,
+    email: userEmail || '',
     newPassword: '',
     confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [searches, setSearches] = useState([]);
-  // Add this useEffect to fetch searches
-useEffect(() => {
-  const fetchSearches = async () => {
-    try {
-      console.log('Fetching searches...'); // Debug log
-      // Update the endpoint to match the timeline route
-      const response = await fetch('http://localhost:4000/api/timeline/searches');
-      
-      if (!response.ok) {
-        console.error('Server response:', response.status);
-        throw new Error('Network response was not ok');
-      }
-      
-      const data = await response.json();
-      console.log('Raw search data:', data); // Debug log
-      
-      // Update how we handle the data based on the response structure
-      if (data) {
-        setSearches(Array.isArray(data) ? data : [data]);
-        console.log('Searches set:', Array.isArray(data) ? data.length : 1, 'items');
-      } else {
-        console.error('No data received from server');
+
+  useEffect(() => {
+    const fetchSearches = async () => {
+      try {
+        if (!userId) return;
+        
+        const response = await fetch(`http://localhost:4000/api/users/search-history/${userId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch search history');
+        }
+        
+        const data = await response.json();
+        setSearches(Array.isArray(data) ? data : []);
+      } catch (err) {
+        console.error('Error fetching searches:', err);
         setSearches([]);
       }
-    } catch (err) {
-      console.error('Error fetching searches:', err);
-      setSearches([]);
-    }
-  };
+    };
 
-  fetchSearches();
-}, []);
+    fetchSearches();
+  }, [userId]);
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
       [name]: value
     }));
+    // Clear any previous error/success messages
+    setError('');
+    setSuccess('');
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setError('');
-  setSuccess('');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccess('');
 
-  // Only validate new password if provided
-  if (formData.newPassword && formData.newPassword !== formData.confirmPassword) {
-    setError('New passwords do not match');
-    return;
-  }
-
-  try {
-    const response = await fetch(`http://localhost:4000/api/users/profile/${userId}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: formData.email,
-        password: formData.newPassword // Changed from newPassword to password
-      }),
-    });
-
-    const data = await response.json();
-
-    if (response.ok) {
-      localStorage.setItem('userEmail', formData.email);
-      setSuccess('Profile updated successfully');
-      setIsEditing(false);
-      setFormData(prev => ({
-        ...prev,
-        newPassword: '',
-        confirmPassword: ''
-      }));
-    } else {
-      setError(data.message || 'Update failed');
+    // Validate passwords if being changed
+    if (formData.newPassword || formData.confirmPassword) {
+      if (formData.newPassword !== formData.confirmPassword) {
+        setError('New passwords do not match');
+        return;
+      }
     }
-  } catch (err) {
-    console.error('Update error:', err);
-    setError('Error connecting to server');
-  }
-};
+
+    try {
+      const response = await fetch(`http://localhost:4000/api/users/profile/${userId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.newPassword || undefined // Only send if new password provided
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        if (formData.email !== userEmail) {
+          localStorage.setItem('userEmail', formData.email);
+        }
+        setSuccess(data.message || 'Profile updated successfully');
+        setIsEditing(false);
+        setFormData(prev => ({
+          ...prev,
+          newPassword: '',
+          confirmPassword: ''
+        }));
+      } else {
+        setError(data.message || 'Update failed');
+      }
+    } catch (err) {
+      console.error('Update error:', err);
+      setError('Error connecting to server. Please try again.');
+    }
+  };
 
   if (!userEmail) {
     return (
-      <>
-       <div className="profile-main-container">
+      <div className="profile-main-container">
         <Header />
         <div className="profile-container">
           <div className="error-message">
@@ -113,26 +109,22 @@ const handleSubmit = async (e) => {
             </button>
           </div>
         </div>
-        <Footer /> 
-        </div>
-      </>
+        <Footer />
+      </div>
     );
   }
 
   return (
-    <>
     <div className="profile-main-container">
       <Header />
       <div className="profile-container">
         <div className="profile-header">
-          <button onClick={() => navigate('/search')} className="return-button">
-            Return to Search
-          </button>
           <h2>My Profile</h2>
         </div>
 
         {success && <div className="success-message">{success}</div>}
         {error && <div className="error-message">{error}</div>}
+        
         {!isEditing ? (
           <>
             <div className="profile-info">
@@ -145,80 +137,87 @@ const handleSubmit = async (e) => {
                 <span>********</span>
               </div>
             </div>
-            <div className="buttons">
-            
-            <button onClick={() => setIsEditing(true)} className="edit-button">
-              Edit Profile
-            </button>
+            <div className="button-row">
+              <button onClick={() => setIsEditing(true)} className="edit-button">
+                Edit Profile
+              </button>
+              <button onClick={() => navigate('/search')} className="return-button">
+                Return to Search
+              </button>
             </div>
+
           </>
         ) : (
           <form onSubmit={handleSubmit} className="edit-form">
             <div className="form-group">
-                <label>Email:</label>
-                <input
+              <label>Email:</label>
+              <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
                 required
-                />
+              />
             </div>
             <div className="form-group">
-                <label>New Password:</label>
-                <input
+              <label>New Password:</label>
+              <input
                 type="password"
                 name="newPassword"
                 value={formData.newPassword}
                 onChange={handleInputChange}
-                />
+              />
             </div>
             <div className="form-group">
-                <label>Confirm New Password:</label>
-                <input
+              <label>Confirm New Password:</label>
+              <input
                 type="password"
                 name="confirmPassword"
                 value={formData.confirmPassword}
                 onChange={handleInputChange}
-                />
+              />
             </div>
             <div className="button-group">
-                <button type="submit" className="save-button">Save Changes</button>
-                <button 
+              <button type="submit" className="save-button">Save Changes</button>
+              <button 
                 type="button" 
-                onClick={() => setIsEditing(false)} 
+                onClick={() => {
+                  setIsEditing(false);
+                  setError('');
+                  setSuccess('');
+                  setFormData(prev => ({
+                    ...prev,
+                    email: userEmail,
+                    newPassword: '',
+                    confirmPassword: ''
+                  }));
+                }} 
                 className="cancel-button"
-                >
+              >
                 Cancel
-                </button>
+              </button>
             </div>
-            </form>
-
+          </form>
         )}
+
         <div className="search-history">
-            <h3>Search History ({searches.length})</h3> 
-            {!searches || searches.length === 0 ? (
+          <h3>Recent Searches ({searches.length})</h3>
+          {searches.length === 0 ? (
             <p>No searches yet</p>
-            ) : (
+          ) : (
             <div className="search-list">
-                {searches.map((search) => (
-                <div key={search._id} className="search-item">
-                    <h4>Search Query: {search.query || 'No query'}</h4>
-                    <p className="search-text">{search.fullText || 'No text available'}</p>
-                    <p className="search-date">
-                    Searched on: {new Date(search.createdAt).toLocaleString()}
-                    </p>
+              {searches.map((term, index) => (
+                <div key={index} className="search-item">
+                  <p className="search-term">{term}</p>
                 </div>
-                ))}
+              ))}
             </div>
-            )}
+          )}
         </div>
       </div>
-      <Footer />      
-      </div>
-    </>
-    );
+      <Footer />
+    </div>
+  );
 };
-
 
 export default Profile;

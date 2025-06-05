@@ -18,39 +18,18 @@ const Search = () => {
   const [error, setError] = useState(null);
   const [startYear, setStartYear] = useState('');
   const [endYear, setEndYear] = useState('');
-  const [searchHistory, setSearchHistory] = useState([]);
   const userId = localStorage.getItem('userId');
 
-  // Fetch search history
   useEffect(() => {
-    const fetchSearchHistory = async () => {
-      if (!userId) return;
-      
-      try {
-        const response = await fetch(`http://localhost:4000/api/users/search-history/${userId}`);
-        if (response.ok) {
-          const history = await response.json();
-          setSearchHistory(history);
-        }
-      } catch (err) {
-        console.error('Failed to fetch search history:', err);
-      }
-    };
+    if (!query) {
+      setFullText('');
+      setTimelineEvents([]);
+      setImages([]);
+      setError(null);
+      return;
+    }
 
-    fetchSearchHistory();
-  }, [userId]);
-
-  // Handle search
-  useEffect(() => {
     const fetchTimelineData = async () => {
-      if (!query) {
-        setFullText('');
-        setTimelineEvents([]);
-        setImages([]);
-        setError(null);
-        return;
-      }
-
       setLoading(true);
       setError(null);
       setFullText('');
@@ -87,7 +66,7 @@ const Search = () => {
         // Save search to user's history
         if (userId) {
           try {
-            const historyResponse = await fetch('http://localhost:4000/api/users/search-history', {
+            await fetch('http://localhost:4000/api/users/search-history', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -97,13 +76,8 @@ const Search = () => {
                 query
               }),
             });
-            
-            if (historyResponse.ok) {
-              const updatedHistory = await historyResponse.json();
-              setSearchHistory(updatedHistory);
-            }
           } catch (historyError) {
-            console.error('Failed to update search history:', historyError);
+            console.error('Failed to save to search history:', historyError);
           }
         }
 
@@ -131,37 +105,18 @@ const Search = () => {
     return side === 'left' ? filteredImages.slice(0, half) : filteredImages.slice(half);
   };
 
-  const handleSearch = ({ query: newQuery, startYear: newStartYear, endYear: newEndYear }) => {
-    setQuery(newQuery);
-    setStartYear(newStartYear);
-    setEndYear(newEndYear);
-  };
-
   return (
     <div className="app-container">
       <Header />
       <h1 className="app-title">Timeline Search</h1>
 
-      <div className="search-section">
-        <SearchBar onSearch={handleSearch} />
-        
-        {searchHistory.length > 0 && (
-          <div className="search-history">
-            <h3>Recent Searches</h3>
-            <ul>
-              {searchHistory.map((term, index) => (
-                <li key={index} onClick={() => handleSearch({ 
-                  query: term,
-                  startYear: '',
-                  endYear: ''
-                })}>
-                  {term}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-      </div>
+      <SearchBar 
+        onSearch={({ query, startYear, endYear }) => {
+          setQuery(query);
+          setStartYear(startYear);
+          setEndYear(endYear);
+        }}
+      />
 
       {loading && query && <Loading query={query} />}
       {error && <ErrorBox error={error} />}

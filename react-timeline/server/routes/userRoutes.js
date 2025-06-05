@@ -26,6 +26,45 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Update user profile
+router.put('/profile/:userId', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findById(req.params.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (email) {
+      // Check if email is already taken by another user
+      const emailExists = await User.findOne({ 
+        email, 
+        _id: { $ne: req.params.userId } 
+      });
+      
+      if (emailExists) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+      user.email = email;
+    }
+
+    if (password) {
+      user.password = password;
+    }
+
+    await user.save();
+    res.json({ 
+      success: true, 
+      message: 'Profile updated successfully',
+      email: user.email
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ message: 'Error updating profile' });
+  }
+});
+
 // Login user
 router.post('/login', async (req, res) => {
   try {
