@@ -28,7 +28,7 @@ body {
   gap: 30px;
   padding: 20px;
   width: 100%;
-  max-width: 1400px; /* גבול מקסימלי לאלמנט המרכזי */
+  max-width: 1400px;
   box-sizing: border-box;
 }
 

@@ -1,5 +1,4 @@
-/* Global variables (using Tailwind's built-in theming instead) */
-/* Colors are part of the Tailwind color palette, can be adjusted in the tailwind.config.js */
+/* Global variables */
 :root {
   --hf-cream: #F2EFE7;
   --hf-mint: #9ACBD0;
@@ -12,50 +11,309 @@
   --hf-text: #006A71;
 }
 
-/* Layout utilities (Tailwind already provides many of these utilities) */
+/* General Layout */
+body {
+  background-color: var(--hf-cream);
+  color: var(--hf-text);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  margin: 0;
+}
+
 .container {
-  @apply w-full max-w-screen-xl mx-auto px-4;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
 }
 
 .text-center {
-  @apply text-center;
+  text-align: center;
 }
 
 .hidden {
-  @apply hidden;
+  display: none;
 }
 
 /* Header and Footer */
 .header, .footer {
-  @apply bg-hf-deep text-hf-cream py-6;
+  background-color: var(--hf-deep);
+  color: var(--hf-cream);
+  padding: 1rem 0;
 }
 
-/* Form components */
+.header {
+  padding: 1.5rem 0;
+}
+
+.footer {
+  margin-top: auto;
+}
+
+.logo-container {
+  margin-bottom: 1rem;
+}
+
+.logo {
+  max-width: 150px;
+  height: auto;
+}
+
+.header-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.header-subtitle {
+  font-size: 1.125rem;
+}
+
+/* Common Form Styles */
+.form-section {
+  padding: 2rem 0;
+  flex-grow: 1;
+}
+
+.card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  padding: 2rem;
+  max-width: 28rem;
+  margin: 0 auto;
+}
+
+.form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
 .form-group {
-  @apply mb-5;
+  margin-bottom: 1rem;
+  width: 100%;
 }
 
 .form-label {
-  @apply block mb-2 font-medium text-hf-deep;
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--hf-deep);
 }
 
-.form-input, select {
-  @apply w-full py-3 px-4 border border-hf-border rounded-md text-base focus:outline-none focus:ring-2 focus:ring-hf-teal;
+.form-input,
+select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--hf-border);
+  border-radius: 0.375rem;
+  font-size: 1rem;
+  transition: all 0.3s ease;
 }
 
-/* Buttons */
+.form-input:focus,
+select:focus {
+  outline: none;
+  border-color: var(--hf-secondary);
+  box-shadow: 0 0 0 3px rgba(72, 166, 167, 0.25);
+}
+
+.form-input.error {
+  border-color: var(--hf-error);
+}
+
+/* Password Field */
+.password-container {
+  position: relative;
+  width: 100%;
+}
+
+.form-input[type="password"] {
+  width: 100%;
+  padding-right: 40px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  color: #8a6d3b;
+}
+
+.eye-icon {
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Button Styles */
+.button-container {
+  margin-top: 1.5rem;
+  width: 100%;
+}
+
 .btn {
-  @apply inline-block py-3 px-6 rounded-md transition duration-300 ease-in-out;
+  display: inline-block;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.375rem;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  width: 100%;
+  position: relative;
 }
 
 .btn-primary {
-  @apply bg-hf-deep text-white hover:bg-hf-cream border-2 border-hf-deep;
+  background-color: var(--hf-deep);
+  color: white;
+  border: 2px solid var(--hf-deep);
+  box-shadow: 0 4px 6px rgba(0, 106, 113, 0.2);
 }
 
 .btn-primary:hover {
-  @apply bg-hf-cream text-hf-deep transform translate-y-1 shadow-lg;
+  background-color: var(--hf-cream);
+  color: var(--hf-deep);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 106, 113, 0.3);
+}
+
+.btn-primary:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 106, 113, 0.2);
+}
+
+.btn.loading {
+  cursor: wait;
+}
+
+.spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 1s ease-in-out infinite;
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+@keyframes spin {
+  to { transform: translateY(-50%) rotate(360deg); }
+}
+
+/* Messages and Alerts */
+.error-message {
+  color: var(--hf-error);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
 }
 
 .alert-box {
-  @apply py-3 px-4 rounded-md mb-4;
+  padding: 0.75rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.alert-error {
+  background-color: rgba(229, 62, 62, 0.1);
+  border: 1px solid var(--hf-error);
+  color: var(--hf-error);
+}
+
+.alert-success {
+  background-color: rgba(56, 161, 105, 0.1);
+  border: 1px solid var(--hf-success);
+  color: var(--hf-success);
+}
+
+/* Links */
+.login-link-container {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.login-link {
+  display: inline-block;
+  padding: 8px 16px;
+  color: var(--hf-deep);
+  border: 1px solid var(--hf-deep);
+  border-radius: 0.375rem;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.15s ease-in-out, color 0.15s ease-in-out;
+}
+
+.login-link:hover {
+  background-color: var(--hf-deep);
+  color: white;
+  text-decoration: none;
+}
+
+/* Utility class for honeypot */
+.honeypot-field {
+  position: absolute;
+  left: -9999px;
+  visibility: hidden;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Base button (for home and profile pages) */
+.base-button {
+  display: inline-block;
+  background-color: #006A71;
+  color: #F2EFE7;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+  border: 2px solid #006A71;
+  box-shadow: 0 4px 6px rgba(0, 106, 113, 0.2);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.base-button:hover {
+  background-color: #F2EFE7;
+  color: #006A71;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 106, 113, 0.3);
+}
+
+.base-button:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 4px rgba(0, 106, 113, 0.2);
+}
+
+/* Responsive styles */
+@media (max-width: 480px) {
+  .header-title {
+    font-size: 1.75rem;
+  }
+
+  .card {
+    padding: 1.5rem;
+  }
+}
+
+/* Accessibility focus states */
+:focus {
+  outline: 2px solid var(--hf-teal);
+  outline-offset: 2px;
 }

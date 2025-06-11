@@ -131,3 +131,10 @@
     color: #006A71;
     cursor: pointer;
 }
+
+/* No results container */
+.no-results {
+    text-align: center;
+    padding: 2rem;
+    color: #006A71;
+}

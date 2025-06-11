@@ -390,21 +390,6 @@ body {
   cursor: wait;
 }
 
-/* Button loader */
-.button-loader {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-radius: 50%;
-  border-top-color: white;
-  animation: spin 1s ease-in-out infinite;
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
 @keyframes spin {
   to { transform: translateY(-50%) rotate(360deg); }
 }

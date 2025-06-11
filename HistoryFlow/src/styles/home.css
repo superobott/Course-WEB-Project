@@ -1,31 +1,5 @@
 @import "tailwindcss";
 
-/* Enhanced button styles */
-.base-button {
-    display: inline-block;
-    background-color: #006A71;
-    color: #F2EFE7;
-    font-weight: 600;
-    padding: 0.75rem 1.5rem;
-    border-radius: 0.5rem;
-    transition: all 0.3s ease;
-    border: 2px solid #006A71;
-    box-shadow: 0 4px 6px rgba(0, 106, 113, 0.2);
-    text-decoration: none;
-}
-
-.base-button:hover {
-    background-color: #F2EFE7;
-    color: #006A71;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0, 106, 113, 0.3);
-}
-
-.base-button:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0, 106, 113, 0.2);
-}
-
 /* Timeline specific styles */
 .timeline-track {
     scroll-behavior: smooth;
