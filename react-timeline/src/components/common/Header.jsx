@@ -10,6 +10,9 @@ function Header() {
   const handleProfileClick = () => {
     navigate('/profile');
   };
+  const handleBubbleClick = () => {
+  navigate('/bubble');
+  };
 
   const handleLogout = async () => {
     const email = localStorage.getItem('userEmail');
@@ -41,6 +44,13 @@ function Header() {
             alt="Profile" 
             className="w-8 h-8 rounded-full"
           />
+        </button>
+        <button 
+          onClick={handleBubbleClick}
+          className="bubble-nav-button"
+          style={{ marginLeft: "12px" }}
+        >
+          Explore Bubbles
         </button>
       </div>
       <div className="header-right">

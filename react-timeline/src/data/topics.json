@@ -1,0 +1,32 @@
+[
+  {
+    "name": "2006",
+    "type": "Year",
+    "image": "/images/2006.png",
+    "color": "#4f8ef7"
+  },
+  {
+    "name": "1999",
+    "type": "Year",
+    "image": "/images/2006.png",
+    "color": "#4f8ef7"
+  },
+  {
+    "name": "India",
+    "type": "Country",
+    "image": "/images/2006.png",
+    "color": "#4f8ef7"
+  },
+  {
+    "name": "1400 BC",
+    "type": "Year",
+    "image": "/images/2006.png",
+    "color": "#4f8ef7"
+  },
+  {
+    "name": "USA",
+    "type": "Country",
+    "image": "/images/2006.png",
+    "color": "#4f8ef7"
+  }
+]
