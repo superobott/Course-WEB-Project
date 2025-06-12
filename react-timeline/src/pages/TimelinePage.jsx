@@ -12,14 +12,12 @@ const TimelinePage = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
 
   useEffect(() => {
-    // קבלת הערכים מה-localStorage
     const storedTopic = localStorage.getItem("selectedTopic");
     const storedType = localStorage.getItem("selectedType");
 
     if (!storedTopic || !storedType) {
-      // אם אין מידע ב-localStorage, אפשר להפנות חזרה לדף הבועות או להציג הודעה
       alert("No topic or type selected! Redirecting to topics page.");
-      window.location.href = "/"; // או הכתובת שלך לדף הבועות
+      window.location.href = "/"; 
       return;
     }
 

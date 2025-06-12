@@ -2,39 +2,58 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import topicsData from "../data/topics.json";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
 import "../style/pagestyle/bubble.css";
 
 const BubblePage = () => {
-  const [searchTerm, setSearchTerm] = useState("");
   const [filteredTopics, setFilteredTopics] = useState([]);
   const navigate = useNavigate();
+  const [filterType, setFilterType] = useState("All");
 
   useEffect(() => {
-    const filtered = topicsData.filter((topic) =>
-      topic.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-    setFilteredTopics(filtered);
-  }, [searchTerm]);
+    const bubbles = document.querySelectorAll(".bubble");
+    bubbles.forEach((bubble) => {
+      const x = bubble.getAttribute("data-x");
+      const y = bubble.getAttribute("data-y");
+      const delay = bubble.getAttribute("data-delay");
+
+      bubble.style.setProperty("--x", x);
+      bubble.style.setProperty("--y", y);
+      bubble.style.setProperty("--delay", delay);
+    });
+  }, [filteredTopics]);
 
   const handleBubbleClick = (topicName, topicType) => {
-    // שמירת המידע ב-localStorage
     localStorage.setItem("selectedTopic", topicName);
     localStorage.setItem("selectedType", topicType);
-    // ניווט לדף הציר זמן בלי פרמטרים
     navigate("/timeline");
   };
 
+  useEffect(() => {
+  const filtered = topicsData.filter((topic) => {
+    if (filterType === "All") return true;
+    if (filterType === "Year") return topic.type === "Year"; 
+    if (filterType === "Events") return topic.type === "Type of Event";
+    if (filterType === "Country") return topic.type === "Country"; 
+    return true;
+  });
+  setFilteredTopics(filtered);
+}, [filterType]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-100 to-white p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">Explore Topics</h1>
-      <div className="flex justify-center mb-8">
-        <input
-          type="text"
-          placeholder="Search topic..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full max-w-md border border-gray-300 rounded-xl p-2"
-        />
+    <div className="bubble-page">
+      <Header />
+      <div className="filter-bar">
+        {["All", "Year", "Events", "Country"].map((type) => (
+          <button
+            key={type}
+            className={`filter-button ${filterType === type ? "active" : ""}`}
+            onClick={() => setFilterType(type)}
+          >
+            {type}
+          </button>
+        ))}
       </div>
       <div className="bubble-container">
         {filteredTopics.map((topic, idx) => {
@@ -46,22 +65,22 @@ const BubblePage = () => {
             <button
               key={idx}
               className="bubble"
-              style={{
-                backgroundColor: topic.color,
-                left: `${x}%`,
-                top: `${y}%`,
-                animationDelay: `${delay}s`,
-              }}
+              data-x={x}
+              data-y={y}
+              data-delay={delay}
               onClick={() => handleBubbleClick(topic.name, topic.type)}
-              title={topic.name}
+              style={{
+                backgroundColor: topic.image ? "transparent" : topic.color,
+                backgroundImage: topic.image ? `url(${topic.image})` : "none",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }}
             >
-              {topic.image && (
-                <img src={topic.image} alt={topic.name} className="bubble-img" />
-              )}
             </button>
           );
         })}
       </div>
+      <Footer />
     </div>
   );
 };
