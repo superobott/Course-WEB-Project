@@ -3,6 +3,8 @@ import React, { useEffect, useState } from "react";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
 import "../style/pagestyle/TimelinePage.css";
+import { useNavigate } from 'react-router-dom';
+
 
 const TimelinePage = () => {
   const [topic, setTopic] = useState(null);
@@ -12,6 +14,7 @@ const TimelinePage = () => {
   const [sortOrder, setSortOrder] = useState("asc");
   const [color, setColor] = useState("#2563eb");
   const [selectedEvent, setSelectedEvent] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedTopic = localStorage.getItem("selectedTopic");
@@ -180,7 +183,15 @@ const TimelinePage = () => {
                 View on OnThisDate
               </a>
             )}
-  
+            <button
+              className="btn"
+              onClick={() =>
+                navigate(`/search?query=${encodeURIComponent(selectedEvent["Name of Incident"])}`)
+              }
+            >
+              Search for more
+            </button>
+              
           </div>
         </div>
       )}

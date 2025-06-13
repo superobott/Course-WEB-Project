@@ -28,7 +28,7 @@ function Header() {
   };
 
   const location = useLocation();
-  const showBackButton = ["/bubble", "/search"].includes(location.pathname);
+  const showBackButton = ["/bubble", "/search", "/timeline"].includes(location.pathname);
 
   return (
     <header className="header">
