@@ -7,6 +7,8 @@ import Search from './pages/Search';
 import Profile from './pages/Profile';
 import TimelinePage from './pages/TimelinePage';
 import BubblePage from './pages/bubble';
+import Choose from './pages/choose';
+
 
 
 function App() {
@@ -31,11 +33,13 @@ function App() {
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/choose" element={<Choose />} />
         <Route path="/register" element={<Register />} />
         <Route path="/search" element={<Search />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/timeline" element={<TimelinePage />} />
         <Route path="/bubble" element={<BubblePage />} />
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
