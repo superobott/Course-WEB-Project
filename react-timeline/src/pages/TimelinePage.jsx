@@ -1,5 +1,7 @@
 // TimelinePage.jsx
 import React, { useEffect, useState } from "react";
+import Header from "../components/common/Header";
+import Footer from "../components/common/Footer";
 import "../style/pagestyle/TimelinePage.css";
 
 const TimelinePage = () => {
@@ -63,16 +65,54 @@ const TimelinePage = () => {
     return <div className="text-center p-6">Loading...</div>;
   }
 
+  const generateOnThisDayLink = (event) => {
+  const day = event.Date?.toString().trim().toLowerCase();
+  const month = event.Month?.toString().trim().toLowerCase();
+  const year = event.Year?.toString().trim();
+
+  const validMonths = [
+    "january", "february", "march", "april", "may", "june",
+    "july", "august", "september", "october", "november", "december"
+  ];
+
+  const isValidMonth = month && validMonths.includes(month);
+
+  const isValidDay = day && !isNaN(day) && Number(day) >= 1 && Number(day) <= 31;
+
+    if (year && isValidMonth && isValidDay) {
+      // year+month+day
+      return `https://www.onthisday.com/date/${year}/${month}/${day}`;
+    } else if (year && isValidMonth) {
+      // year+month
+      return `https://www.onthisday.com/date/${year}/${month}`;
+    } else if (year) {
+      // year only
+      return `https://www.onthisday.com/date/${year}`;
+    } else if (isValidMonth && isValidDay) {
+      // month+day
+      return `https://www.onthisday.com/day/${month}/${day}`;
+    } else {
+      // default to the main page
+      return "https://www.onthisday.com";
+    }
+  };
+
+
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-blue-100 p-6">
-      <h1 className="text-3xl font-bold text-center mb-6">
-        {topic} Timeline <span className="text-base text-gray-500">({type})</span>
-      </h1>
+    <div className="timeline-page">
+      <Header /> 
+      <div className="timeline-Container" > 
+      <div class="container-wrapper"></div> 
+        <h1 className="app-title"> {topic} Timeline </h1>
 
       {/* Controls */}
-      <div className="flex gap-4 justify-center mb-6">
+      <div className="button-container">
         <button onClick={handleSort} className="btn">
           {sortOrder === "asc" ? "Past → Future" : "Future → Past"}
+        </button>
+        <button onClick={handleExportPDF} className="btn">
+          Export to PDF
         </button>
         <input
           type="color"
@@ -80,9 +120,7 @@ const TimelinePage = () => {
           onChange={handleColorChange}
           title="Pick timeline color"
         />
-        <button onClick={handleExportPDF} className="btn">
-          Export to PDF
-        </button>
+        
       </div>
 
       {/* Timeline */}
@@ -97,8 +135,12 @@ const TimelinePage = () => {
               style={{ borderColor: color }}
               onClick={() => setSelectedEvent(event)}
             >
-              <div className="timeline-date">
-                {event.Month || "Unknown"} {event.Year}
+              <div className="timeline-date">{[
+                  event.Month,
+                  event.Year
+                ]
+                  .filter(val => val !== "Unknown" && val !== "לא ידוע")
+                  .join(" ")}
               </div>
               <div className="timeline-title">{event["Name of Incident"]}</div>
             </div>
@@ -111,18 +153,39 @@ const TimelinePage = () => {
         <div className="timeline-modal" onClick={() => setSelectedEvent(null)}>
           <div className="timeline-modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{selectedEvent["Name of Incident"]}</h2>
-            <p><strong>Date:</strong> {selectedEvent.Date || "Unknown"} {selectedEvent.Month || ""} {selectedEvent.Year}</p>
+            <p>
+              <strong>Date:</strong>{" "}
+              {[
+                selectedEvent.Date,
+                selectedEvent.Month,
+                selectedEvent.Year
+              ]
+                .filter(val => val !== "Unknown")
+                .join(" ") || "Unknown"}
+            </p>
             <p><strong>Country:</strong> {selectedEvent.Country}</p>
             <p><strong>Place:</strong> {selectedEvent["Place Name"]}</p>
             <p><strong>Impact:</strong> {selectedEvent.Impact}</p>
             <p><strong>Affected Population:</strong> {selectedEvent["Affected Population"]}</p>
-            <p><strong>Important Person/Group:</strong> {selectedEvent["Important Person/Group"]}</p>
-            <p><strong>Responsible:</strong> {selectedEvent.Responsible}</p>
+            <p><strong>Important Person/Group Responsible:</strong> {selectedEvent["Important Person/Group Responsible"]}</p>
             <p><strong>Outcome:</strong> {selectedEvent.Outcome}</p>
-            <button onClick={() => setSelectedEvent(null)} className="btn mt-4">Close</button>
+            <button onClick={() => setSelectedEvent(null)} className="btn">Close</button>
+            {(selectedEvent.Year || selectedEvent.Month || selectedEvent.Date) && (
+              <a
+                href={generateOnThisDayLink(selectedEvent)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn no-underline"
+              >
+                View on OnThisDate
+              </a>
+            )}
+  
           </div>
         </div>
       )}
+      </div>
+      <Footer />
     </div>
   );
 };
