@@ -12,7 +12,8 @@ app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 
 // Connect to MongoDB
-mongoose.connect('mongodb+srv://Team_20:Team_20@web-database.y3fu8pk.mongodb.net/Timeline?retryWrites=true&w=majority&appName=Web-DataBase')
+require('dotenv').config();
+mongoose.connect(process.env.MONGO_URI) 
   .then(() => {
     console.log('MongoDB connected successfully');
     // Debug: Check if we can access the searches collection
