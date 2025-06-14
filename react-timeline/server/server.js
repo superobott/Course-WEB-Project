@@ -19,9 +19,15 @@ const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 4000;
+const CORS_ORIGIN = process.env.NODE_ENV === 'production' 
+  ? ['https://course-web-project.vercel.app']
+  : ['https://course-web-project.vercel.app', 'http://localhost:3000'];
+
 app.use(cors({
-  origin: ['https://course-web-project.vercel.app', 'http://localhost:3000'],
-  credentials: true
+  origin: CORS_ORIGIN,
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
