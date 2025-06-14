@@ -1,17 +1,5 @@
 require('dotenv').config();
 
-// Server Configuration
-const CONFIG = {
-  maxRetries: 3,
-  timeout: 5000,
-  endpoints: {
-    users: '/api/users',
-    timeline: '/',
-    bubbleTimeline: '/api',
-    searches: '/searches'
-  }
-};
-
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -19,22 +7,17 @@ const cors = require('cors');
 
 const app = express();
 const port = process.env.PORT || 4000;
-const CORS_ORIGIN = process.env.NODE_ENV === 'production' 
-  ? ['https://course-web-project.vercel.app']
-  : ['https://course-web-project.vercel.app', 'http://localhost:3000'];
 
+// Configure CORS for Vercel frontend
 app.use(cors({
-  origin: CORS_ORIGIN,
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: 'https://course-web-project.vercel.app',
+  credentials: true
 }));
 app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 
-// Connect to MongoDB
-require('dotenv').config();
-mongoose.connect(process.env.MONGO_URI) 
+// Connect to MongoDB Atlas
+mongoose.connect('mongodb+srv://Team_20:Team_20@web-database.y3fu8pk.mongodb.net/Timeline?retryWrites=true&w=majority&appName=Web-DataBase')
   .then(() => {
     console.log('MongoDB connected successfully');
     // Debug: Check if we can access the searches collection
