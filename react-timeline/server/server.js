@@ -20,27 +20,52 @@ app.use(express.text({ type: '*/*' }));
 let cachedDb = null;
 
 async function connectToDatabase() {
-  if (cachedDb) {
+  if (cachedDb && mongoose.connection.readyState === 1) {
     return cachedDb;
   }
 
   try {
     const mongoUri = process.env.MONGO_URI || process.env.MONGO_URL;
     if (!mongoUri) {
-      throw new Error('MongoDB connection URI not provided');
+      throw new Error('MongoDB connection URI not provided in environment variables');
+    }
+
+    // Close existing connection if exists
+    if (mongoose.connection.readyState !== 0) {
+      await mongoose.connection.close();
     }
 
     await mongoose.connect(mongoUri, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      serverSelectionTimeoutMS: 5000, // Timeout after 5 seconds
+      socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    });
+
+    mongoose.connection.on('error', (err) => {
+      console.error('MongoDB connection error:', {
+        message: err.message,
+        stack: err.stack,
+        name: err.name
+      });
+    });
+
+    mongoose.connection.on('disconnected', () => {
+      console.log('MongoDB disconnected');
+      cachedDb = null;
     });
 
     cachedDb = mongoose.connection;
     console.log('Connected to MongoDB Atlas successfully');
     return cachedDb;
   } catch (error) {
-    console.error('MongoDB Atlas connection error:', error);
-    throw error; // Let the route handler catch this
+    console.error('MongoDB Atlas connection error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name,
+      mongoUri: process.env.MONGO_URI ? '[URI exists]' : '[URI missing]'
+    });
+    throw error;
   }
 }
 
@@ -56,8 +81,17 @@ app.get('/searches', async (req, res) => {
     console.log('Fetched searches:', searches.length);
     res.json(searches);
   } catch (err) {
-    console.error('Error in /searches:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    console.error('Error in /searches:', {
+      message: err.message,
+      stack: err.stack,
+      name: err.name,
+      connectionState: mongoose.connection.readyState
+    });
+    res.status(500).json({
+      message: 'Error fetching searches',
+      error: err.message,
+      details: err.name === 'MongoServerError' ? 'Database connection issue' : 'Server processing error'
+    });
   }
 });
 
@@ -91,10 +125,35 @@ app.use('/api', async (req, res, next) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(500).json({
-    message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : 'An error occurred'
+  const errorDetails = {
+    message: err.message,
+    stack: err.stack,
+    name: err.name,
+    path: req.path,
+    method: req.method,
+    connectionState: mongoose.connection.readyState
+  };
+  
+  console.error('Global error handler:', errorDetails);
+
+  let statusCode = 500;
+  let errorMessage = 'Internal server error';
+
+  // Customize error response based on error type
+  if (err.name === 'ValidationError') {
+    statusCode = 400;
+    errorMessage = 'Invalid request data';
+  } else if (err.name === 'MongoServerError') {
+    errorMessage = 'Database operation failed';
+  } else if (err.name === 'MongooseError') {
+    errorMessage = 'Database connection error';
+  }
+
+  res.status(statusCode).json({
+    message: errorMessage,
+    error: err.message,
+    details: errorDetails.name,
+    path: errorDetails.path
   });
 });
 

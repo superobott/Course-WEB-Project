@@ -21,8 +21,15 @@ router.post('/register', async (req, res) => {
     await user.save();
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Error registering user' });
+    console.error('Registration error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({
+      message: 'Error registering user',
+      error: error.message
+    });
   }
 });
 
@@ -60,8 +67,15 @@ router.put('/profile/:userId', async (req, res) => {
       email: user.email
     });
   } catch (error) {
-    console.error('Profile update error:', error);
-    res.status(500).json({ message: 'Error updating profile' });
+    console.error('Profile update error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({
+      message: 'Error updating profile',
+      error: error.message
+    });
   }
 });
 
@@ -87,8 +101,15 @@ router.post('/login', async (req, res) => {
       email: user.email
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Error logging in' });
+    console.error('Login error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({
+      message: 'Error logging in',
+      error: error.message
+    });
   }
 });
 
@@ -99,8 +120,15 @@ router.post('/logout', async (req, res) => {
     await LoggedInUser.deleteOne({ email });
     res.json({ success: true, message: 'Logged out successfully' });
   } catch (error) {
-    console.error('Logout error:', error);
-    res.status(500).json({ message: 'Error logging out' });
+    console.error('Logout error:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
+    res.status(500).json({
+      message: 'Error logging out',
+      error: error.message
+    });
   }
 });
 
@@ -113,8 +141,15 @@ router.get('/search-history/:userId', async (req, res) => {
     }
     res.json(user.searchHistory || []);
   } catch (err) {
-    console.error('Search history fetch error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Search history fetch error:', {
+      message: err.message,
+      stack: err.stack,
+      name: err.name
+    });
+    res.status(500).json({
+      message: 'Error fetching search history',
+      error: err.message
+    });
   }
 });
 
@@ -142,8 +177,15 @@ router.post('/search-history', async (req, res) => {
 
     res.json(user.searchHistory);
   } catch (err) {
-    console.error('Error adding to search history:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error adding to search history:', {
+      message: err.message,
+      stack: err.stack,
+      name: err.name
+    });
+    res.status(500).json({
+      message: 'Error adding to search history',
+      error: err.message
+    });
   }
 });
 
