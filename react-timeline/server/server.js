@@ -1,13 +1,28 @@
 require('dotenv').config();
 
+// Server Configuration
+const CONFIG = {
+  maxRetries: 3,
+  timeout: 5000,
+  endpoints: {
+    users: '/api/users',
+    timeline: '/',
+    bubbleTimeline: '/api',
+    searches: '/searches'
+  }
+};
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const port = 4000;
-app.use(cors());
+const port = process.env.PORT || 4000;
+app.use(cors({
+  origin: ['https://course-web-project.vercel.app', 'http://localhost:3000'],
+  credentials: true
+}));
 app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 

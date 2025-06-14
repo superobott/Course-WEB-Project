@@ -13,6 +13,8 @@
     "html2canvas": "^1.4.1",
     "html2pdf.js": "^0.10.3",
     "jspdf": "^3.0.1",
+    "mongodb": "^6.17.0",
+    "mongoose": "^8.15.2",
     "node-fetch": "^3.3.2",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
