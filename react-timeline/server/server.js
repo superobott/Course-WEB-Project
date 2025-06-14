@@ -7,21 +7,33 @@ const cors = require('cors');
 
 const app = express();
 const port = 4000;
-app.use(cors());
+app.use(cors({
+  origin: ['https://course-web-project.vercel.app'],
+  credentials: true
+}));
 app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 
 // Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/Timeline')
-  .then(() => {
-    console.log('MongoDB connected successfully');
-    // Debug: Check if we can access the searches collection
-    mongoose.connection.db.collection('searches').countDocuments()
-      .then(count => {
-        console.log(`Number of documents in searches collection: ${count}`);
-      });
-  })
-  .catch(err => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URL, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => {
+  console.log('Connected to MongoDB Atlas successfully');
+  // Debug: Check if we can access the searches collection
+  mongoose.connection.db.collection('searches').countDocuments()
+    .then(count => {
+      console.log(`Number of documents in searches collection: ${count}`);
+    })
+    .catch(err => {
+      console.error('Error checking searches collection:', err);
+    });
+})
+.catch(err => {
+  console.error('MongoDB Atlas connection error:', err);
+  process.exit(1); // Exit process with failure if database connection fails
+});
 
 // Use routes
 const timelineRoutes = require('./routes/timelineRoutes');
