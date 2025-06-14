@@ -4,13 +4,13 @@
   "private": true,
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "client": "cd .. && react-scripts start",
-    "build": "cd .. && react-scripts build",
-    "build:tailwind": "cd .. && tailwindcss -i ./src/input.css -o ./src/output.css --watch",
-    "test": "cd .. && react-scripts test",
-    "eject": "cd .. && react-scripts eject",
+    "start": "node server/server.js",
+    "dev": "nodemon server/server.js",
+    "client": "react-scripts start",
+    "build": "react-scripts build",
+    "build:tailwind": "tailwindcss -i ./src/input.css -o ./src/output.css --watch",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
     "dev:all": "concurrently \"npm run dev\" \"npm run client\""
   },
   "dependencies": {
