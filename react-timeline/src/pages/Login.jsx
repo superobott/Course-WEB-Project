@@ -43,10 +43,14 @@ const Login = () => {
         // Redirect to search page after successful login
         navigate('/choose');
       } else {
-        setError(data.message || 'Login failed');
+        if (response.status === 503) {
+          setError('Server is temporarily unavailable. Please try again in a moment.');
+        } else {
+          setError(data.message || 'Login failed');
+        }
       }
     } catch (err) {
-      setError('Error connecting to server');
+      setError('Error connecting to server. Please check your internet connection and try again.');
     }
   };
 

@@ -3,6 +3,22 @@ const router = express.Router();
 const User = require('../models/UserModel');
 const LoggedInUser = require('../models/LoggedInUserModel');
 
+// Retry function for database operations
+const retryOperation = async (operation, maxRetries = 3) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      console.log(`Operation attempt ${attempt} failed:`, error.message);
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      // Wait before retrying (exponential backoff)
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+    }
+  }
+};
+
 // Register new user
 router.post('/register', async (req, res) => {
   try {
@@ -13,26 +29,41 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const existingUser = await User.findOne({ email });
+    // Check for existing user with retry
+    const existingUser = await retryOperation(async () => {
+      return await User.findOne({ email });
+    });
+
     if (existingUser) {
       console.log('User already exists:', email);
       return res.status(400).json({ message: 'User already exists' });
     }
 
-    const user = new User({
-      email,
-      password,
-      searchHistory: []
+    // Create and save new user with retry
+    await retryOperation(async () => {
+      const user = new User({
+        email,
+        password,
+        searchHistory: []
+      });
+      return await user.save();
     });
 
-    await user.save();
     console.log('User registered successfully:', email);
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
     console.error('Registration error details:', error);
     console.error('Error name:', error.name);
     console.error('Error message:', error.message);
-    res.status(500).json({ message: 'Error registering user', details: error.message });
+    
+    // Provide more specific error messages
+    if (error.name === 'MongooseServerSelectionError') {
+      res.status(503).json({ message: 'Database connection failed. Please try again.' });
+    } else if (error.name === 'MongooseTimeoutError') {
+      res.status(503).json({ message: 'Database operation timed out. Please try again.' });
+    } else {
+      res.status(500).json({ message: 'Error registering user', details: error.message });
+    }
   }
 });
 
@@ -85,7 +116,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Email and password are required' });
     }
 
-    const user = await User.findOne({ email });
+    // Find user with retry
+    const user = await retryOperation(async () => {
+      return await User.findOne({ email });
+    });
     
     if (!user) {
       console.log('User not found:', email);
@@ -97,7 +131,11 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
-    await LoggedInUser.create({ email });
+    // Create logged in user record with retry
+    await retryOperation(async () => {
+      return await LoggedInUser.create({ email });
+    });
+    
     console.log('User logged in successfully:', email);
 
     res.json({
@@ -109,7 +147,15 @@ router.post('/login', async (req, res) => {
     console.error('Login error details:', error);
     console.error('Error name:', error.name);
     console.error('Error message:', error.message);
-    res.status(500).json({ message: 'Error logging in', details: error.message });
+    
+    // Provide more specific error messages
+    if (error.name === 'MongooseServerSelectionError') {
+      res.status(503).json({ message: 'Database connection failed. Please try again.' });
+    } else if (error.name === 'MongooseTimeoutError') {
+      res.status(503).json({ message: 'Database operation timed out. Please try again.' });
+    } else {
+      res.status(500).json({ message: 'Error logging in', details: error.message });
+    }
   }
 });
 

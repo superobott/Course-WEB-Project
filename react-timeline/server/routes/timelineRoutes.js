@@ -7,6 +7,21 @@ const Search = require('../models/SearchModel');
 const { sortTimelineEvents, extractYear, filterTimelineEventsByYear } = require('../utils/timelineUtils');
 const fetch = require('node-fetch');
 
+// Retry function for database operations
+const retryOperation = async (operation, maxRetries = 3) => {
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      console.log(`Timeline operation attempt ${attempt} failed:`, error.message);
+      if (attempt === maxRetries) {
+        throw error;
+      }
+      await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+    }
+  }
+};
+
 
 // Get all searches
 router.get('/api/timeline/searches', async (req, res) => {
@@ -23,6 +38,8 @@ router.get('/api/timeline/searches', async (req, res) => {
 
 //Routes
 router.get('/search', async (req, res) => {
+  console.log('🔍 Search route called with query:', req.query);
+  
   const query = req.query.q;
   const startYearInput = req.query.startYear;
   const endYearInput = req.query.endYear;
@@ -41,10 +58,17 @@ router.get('/search', async (req, res) => {
     return res.status(400).json({ error: 'Query parameter "q" is required.' });
   }
 
+  console.log(`🎯 Processing search for: "${query}" (${startYear} - ${endYear})`);
+
   try {
-    let cachedData = await TimelineModel.findOne({ query: query.toLowerCase() });
+    // Check for cached data with retry
+    console.log('📋 Checking cache for query:', query.toLowerCase());
+    let cachedData = await retryOperation(async () => {
+      return await TimelineModel.findOne({ query: query.toLowerCase() });
+    });
+    
     if (cachedData) {
-      console.log(`Found "${query}" in DB.`);
+      console.log(`✅ Found "${query}" in DB cache.`);
 
       let filteredEvents = cachedData.timelineEvents;
       if (startYear !== null && endYear !== null) {
@@ -59,9 +83,17 @@ router.get('/search', async (req, res) => {
       });
     }
 
+    console.log('🌐 No cache found, fetching from Wikipedia...');
     const wikipediaUrl = `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&titles=${encodeURIComponent(query)}&explaintext=1&redirects=1`;
+    console.log('🔗 Wikipedia URL:', wikipediaUrl);
+    
     const wikipediaResponse = await fetch(wikipediaUrl);
+    if (!wikipediaResponse.ok) {
+      throw new Error(`Wikipedia API failed: ${wikipediaResponse.status} ${wikipediaResponse.statusText}`);
+    }
+    
     const wikipediaData = await wikipediaResponse.json();
+    console.log('📄 Wikipedia response received');
 
     const pageId = Object.keys(wikipediaData.query.pages)[0];
     const page = wikipediaData.query.pages[pageId];
@@ -71,32 +103,53 @@ router.get('/search', async (req, res) => {
 
     if (page.missing) {
       fullText = `No exact match found on Wikipedia for "${query}".`;
-      images=[];
-      console.log("term doesnt found");
+      images = [];
+      console.log('❌ Wikipedia: term not found');
     } else {
       fullText = page.extract || `No extract available from Wikipedia for "${query}".`;
-      timelineEvents = await generateTimelineFromGemini(fullText);
-      timelineEvents = sortTimelineEvents(timelineEvents);
-      timelineEvents = timelineEvents.filter(event => extractYear(event.date) !== null);
-      images = await fetchUnsplashImages(query); 
-      console.log(`Gemini generated ${timelineEvents.length} events.`);
-      console.log(`Found ${images.length} images`);
+      console.log(`📝 Wikipedia text length: ${fullText.length} characters`);
+      
+      console.log('🤖 Generating timeline with Gemini...');
+      try {
+        timelineEvents = await generateTimelineFromGemini(fullText);
+        timelineEvents = sortTimelineEvents(timelineEvents);
+        timelineEvents = timelineEvents.filter(event => extractYear(event.date) !== null);
+        console.log(`✅ Gemini generated ${timelineEvents.length} events.`);
+      } catch (geminiError) {
+        console.error('❌ Gemini API error:', geminiError.message);
+        timelineEvents = [];
+      }
+      
+      console.log('🖼️ Fetching images from Unsplash...');
+      try {
+        images = await fetchUnsplashImages(query);
+        console.log(`✅ Found ${images.length} images`);
+      } catch (unsplashError) {
+        console.error('❌ Unsplash API error:', unsplashError.message);
+        images = [];
+      }
     }
 
-    const newTimelineEntry = new TimelineModel({
-      query: query.toLowerCase(),
-      fullText,
-      timelineEvents,
-      images,
+    // Save to database with retry
+    console.log('💾 Saving to database...');
+    await retryOperation(async () => {
+      const newTimelineEntry = new TimelineModel({
+        query: query.toLowerCase(),
+        fullText,
+        timelineEvents,
+        images,
+      });
+      return await newTimelineEntry.save();
     });
-
-    await newTimelineEntry.save();
-    console.log(`Saved "${query}" to DB.`);
+    
+    console.log(`✅ Saved "${query}" to DB.`);
 
     let filteredEvents = timelineEvents;
     if (startYear !== null && endYear !== null) {
       filteredEvents = filterTimelineEventsByYear(timelineEvents, startYear, endYear);
     }
+
+    console.log(`📊 Returning ${filteredEvents.length} filtered events`);
 
     return res.json({
       extract: fullText,
@@ -106,8 +159,17 @@ router.get('/search', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in /search:', error);
-    res.status(500).json({ error: 'Failed to process search request.', details: error.message });
+    console.error('💥 Error in /search:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    
+    if (error.name === 'MongooseServerSelectionError') {
+      res.status(503).json({ error: 'Database connection failed. Please try again.' });
+    } else if (error.message.includes('Wikipedia API failed')) {
+      res.status(503).json({ error: 'Wikipedia service unavailable. Please try again.' });
+    } else {
+      res.status(500).json({ error: 'Failed to process search request.', details: error.message });
+    }
   }
 });
 

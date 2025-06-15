@@ -20,26 +20,87 @@ app.use(cors({
 app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 
-// Connect to MongoDB Atlas
+// MongoDB connection with proper error handling for serverless
 const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://timeline_user:4r5t6y7u8I@timeline-cluster.xsx3fwr.mongodb.net/Timeline?retryWrites=true&w=majority&appName=timeline-cluster';
 console.log('Environment:', process.env.NODE_ENV);
 console.log('MongoDB URI configured:', mongoUri ? 'Yes' : 'No');
 console.log('Using fallback URI:', !process.env.MONGODB_URI);
 
-mongoose.connect(mongoUri)
-  .then(() => {
+// Configure mongoose for serverless
+mongoose.set('bufferCommands', false);
+mongoose.set('bufferMaxEntries', 0);
+
+// Connection function with retry logic
+const connectToMongoDB = async () => {
+  try {
+    if (mongoose.connection.readyState === 1) {
+      console.log('MongoDB already connected');
+      return;
+    }
+
+    console.log('Connecting to MongoDB...');
+    await mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 10000, // 10 seconds
+      socketTimeoutMS: 45000, // 45 seconds
+      maxPoolSize: 10, // Maintain up to 10 socket connections
+      minPoolSize: 1, // Maintain a minimum of 1 socket connection
+      maxIdleTimeMS: 30000, // Close connections after 30 seconds of inactivity
+    });
+    
     console.log('MongoDB connected successfully');
     console.log('Connected to database:', mongoose.connection.name);
-    // Debug: Check if we can access the searches collection
-    mongoose.connection.db.collection('searches').countDocuments()
-      .then(count => {
-        console.log(`Number of documents in searches collection: ${count}`);
-      });
-  })
-  .catch(err => {
+    
+    // Test connection with searches collection
+    try {
+      const count = await mongoose.connection.db.collection('searches').countDocuments();
+      console.log(`Number of documents in searches collection: ${count}`);
+    } catch (collectionError) {
+      console.log('Searches collection not accessible or doesn\'t exist yet');
+    }
+  } catch (err) {
     console.error('MongoDB connection error:', err);
-    console.error('Connection string used:', mongoUri.replace(/:[^:]*@/, ':****@')); // Hide password in logs
-  });
+    console.error('Connection string used:', mongoUri.replace(/:[^:]*@/, ':****@'));
+    throw err;
+  }
+};
+
+// Handle connection events
+mongoose.connection.on('disconnected', () => {
+  console.log('MongoDB disconnected');
+});
+
+mongoose.connection.on('reconnected', () => {
+  console.log('MongoDB reconnected');
+});
+
+mongoose.connection.on('error', (err) => {
+  console.error('MongoDB connection error:', err);
+});
+
+// Initial connection
+connectToMongoDB().catch(err => {
+  console.error('Failed to connect to MongoDB on startup:', err);
+});
+
+// Middleware to ensure MongoDB connection before handling requests
+const ensureMongoConnection = async (req, res, next) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      console.log('MongoDB not connected, attempting to reconnect...');
+      await connectToMongoDB();
+    }
+    next();
+  } catch (error) {
+    console.error('Failed to ensure MongoDB connection:', error);
+    res.status(503).json({ 
+      message: 'Database connection unavailable',
+      details: 'Please try again in a moment'
+    });
+  }
+};
+
+// Apply connection middleware to all routes
+app.use(ensureMongoConnection);
 
 // Use routes
 const timelineRoutes = require('./routes/timelineRoutes');
@@ -57,14 +118,67 @@ app.get('/searches', async (req, res) => {
   }
 });
 
-// Debug endpoint to check environment variables
+// Debug endpoint to check environment variables and connection status
 app.get('/debug', (req, res) => {
+  const connectionStates = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting'
+  };
+
   res.json({
     nodeEnv: process.env.NODE_ENV,
     mongoUriSet: !!process.env.MONGODB_URI,
     mongoConnection: mongoose.connection.readyState,
-    connectionName: mongoose.connection.name
+    connectionState: connectionStates[mongoose.connection.readyState],
+    connectionName: mongoose.connection.name,
+    host: mongoose.connection.host,
+    port: mongoose.connection.port,
+    apiKeys: {
+      geminiConfigured: !!process.env.GEMINI_API_KEY,
+      unsplashConfigured: !!process.env.UNSPLASH_ACCESS_KEY
+    },
+    timestamp: new Date().toISOString()
   });
+});
+
+// Debug endpoint specifically for dataset collections
+app.get('/debug/collections', async (req, res) => {
+  try {
+    if (mongoose.connection.readyState !== 1) {
+      return res.status(503).json({ message: 'Database not connected' });
+    }
+
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    const collectionDetails = [];
+
+    for (const collection of collections) {
+      try {
+        const count = await mongoose.connection.db.collection(collection.name).countDocuments();
+        const sample = await mongoose.connection.db.collection(collection.name).findOne();
+        
+        collectionDetails.push({
+          name: collection.name,
+          count: count,
+          sampleFields: sample ? Object.keys(sample) : []
+        });
+      } catch (err) {
+        collectionDetails.push({
+          name: collection.name,
+          error: err.message
+        });
+      }
+    }
+
+    res.json({
+      database: mongoose.connection.name,
+      totalCollections: collections.length,
+      collections: collectionDetails
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 app.use('/api/users', userRoutes);
