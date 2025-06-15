@@ -2,18 +2,18 @@
   "version": 2,
   "builds": [
     {
-      "src": "server/server.js",
+      "src": "react-timeline/server/server.js",
       "use": "@vercel/node",
       "config": {
         "maxDuration": 30,
-        "includeFiles": ["server/**"]
+        "includeFiles": ["react-timeline/server/**"]
       }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "server/server.js",
+      "dest": "react-timeline/server/server.js",
       "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
       "headers": {
         "Access-Control-Allow-Credentials": "true",
@@ -26,5 +26,5 @@
   "env": {
     "NODE_ENV": "production",
     "MONGODB_TIMEOUT": "15000"
-  },
+  }
 }
