@@ -4,6 +4,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -11,7 +12,7 @@ const port = process.env.PORT || 4000;
 // Configure CORS for production
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-vercel-app.vercel.app'] // Replace with your actual Vercel domain
+    ? ['https://course-web-project-37jp.vercel.app']
     : ['http://localhost:3000'],
   credentials: true
 }));
@@ -51,6 +52,19 @@ app.get('/searches', async (req, res) => {
 app.use('/api/users', userRoutes);
 app.use('/', timelineRoutes);
 app.use('/api', bubbleTimelineRoutes);
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, '..', 'build')));
+
+// Catch-all handler: send back React's index.html file for any non-API routes
+app.get('*', (req, res) => {
+  // Don't serve index.html for API routes
+  if (req.path.startsWith('/api') || req.path.startsWith('/search') || req.path.startsWith('/searches')) {
+    return res.status(404).json({ message: 'API route not found' });
+  }
+  res.sendFile(path.join(__dirname, '..', 'build', 'index.html'));
+});
+
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });

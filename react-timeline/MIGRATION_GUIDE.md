@@ -109,10 +109,10 @@
      - `NODE_ENV`: `production`
 
 4. **Update CORS Configuration**
-   - After deployment, get your Vercel app URL (e.g., `https://yourapp.vercel.app`)
-   - Update the CORS origin in `server/server.js` line 12:
+   - Your Vercel app URL is: `https://course-web-project-37jp.vercel.app`
+   - The CORS origin has been updated in `server/server.js`:
      ```javascript
-     ? ['https://yourapp.vercel.app'] // Replace with your actual Vercel domain
+     ? ['https://course-web-project-37jp.vercel.app']
      ```
 
 5. **Redeploy**
