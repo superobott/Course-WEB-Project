@@ -24,9 +24,12 @@
   "scripts": {
     "start": "react-scripts start",
     "build:tailwind": "tailwindcss -i ./src/input.css -o ./src/output.css --watch",
-    "build": "react-scripts build",
+    "build": "npm run build:tailwind:prod && react-scripts build",
+    "build:tailwind:prod": "tailwindcss -i ./src/input.css -o ./src/output.css --minify",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "server": "cd server && npm run dev",
+    "server:prod": "cd server && npm start"
   },
   "eslintConfig": {
     "extends": [

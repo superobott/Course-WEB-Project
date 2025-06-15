@@ -6,13 +6,22 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 
 const app = express();
-const port = 4000;
-app.use(cors());
+const port = process.env.PORT || 4000;
+
+// Configure CORS for production
+app.use(cors({
+  origin: process.env.NODE_ENV === 'production' 
+    ? ['https://your-vercel-app.vercel.app'] // Replace with your actual Vercel domain
+    : ['http://localhost:3000'],
+  credentials: true
+}));
+
 app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 
-// Connect to MongoDB
-mongoose.connect('mongodb://localhost:27017/Timeline')
+// Connect to MongoDB Atlas
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/Timeline';
+mongoose.connect(mongoUri)
   .then(() => {
     console.log('MongoDB connected successfully');
     // Debug: Check if we can access the searches collection
