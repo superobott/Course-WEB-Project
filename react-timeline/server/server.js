@@ -20,7 +20,7 @@ app.use(bodyParser.json());
 app.use(express.text({ type: '*/*' }));
 
 // Connect to MongoDB Atlas
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/Timeline';
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://timeline_user:4r5t6y7u8I@timeline-cluster.xsx3fwr.mongodb.net/Timeline?retryWrites=true&w=majority&appName=timeline-cluster';
 mongoose.connect(mongoUri)
   .then(() => {
     console.log('MongoDB connected successfully');

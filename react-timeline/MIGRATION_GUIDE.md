@@ -34,7 +34,7 @@
    - Go to "Clusters" and click "Connect"
    - Choose "Connect your application"
    - Copy the connection string
-   - It will look like: `mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/`
+   - Your connection string is: `mongodb+srv://timeline_user:<db_password>@timeline-cluster.xsx3fwr.mongodb.net/Timeline?retryWrites=true&w=majority&appName=timeline-cluster`
 
 ## Step 2: Migrate Your Data
 
@@ -45,7 +45,7 @@
 
 2. **Import to Atlas**
    ```bash
-   mongorestore --uri "mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/Timeline" ./backup/Timeline
+   mongorestore --uri "mongodb+srv://timeline_user:<db_password>@timeline-cluster.xsx3fwr.mongodb.net/Timeline" ./backup/Timeline
    ```
 
 ## Step 3: Set Up Environment Variables
@@ -53,7 +53,7 @@
 1. **Create `.env` file in the `server` directory:**
    ```env
    # MongoDB Atlas Configuration
-   MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-name>.mongodb.net/Timeline?retryWrites=true&w=majority
+   MONGODB_URI=mongodb+srv://timeline_user:<db_password>@timeline-cluster.xsx3fwr.mongodb.net/Timeline?retryWrites=true&w=majority&appName=timeline-cluster
    
    # API Keys
    GEMINI_API_KEY=your_actual_gemini_api_key
@@ -65,9 +65,7 @@
    ```
 
 2. **Replace placeholders:**
-   - `<username>`: Your MongoDB Atlas database username
-   - `<password>`: Your MongoDB Atlas database password
-   - `<cluster-name>`: Your cluster name
+   - `<db_password>`: Your MongoDB Atlas database password (replace with your actual password)
    - Replace API keys with your actual keys
 
 ## Step 4: Test Locally
@@ -105,7 +103,7 @@
    - Click on "Settings" tab
    - Click on "Environment Variables"
    - Add each environment variable:
-     - `MONGODB_URI`: Your MongoDB Atlas connection string
+     - `MONGODB_URI`: `mongodb+srv://timeline_user:YOUR_ACTUAL_PASSWORD@timeline-cluster.xsx3fwr.mongodb.net/Timeline?retryWrites=true&w=majority&appName=timeline-cluster` (replace YOUR_ACTUAL_PASSWORD with your real password)
      - `GEMINI_API_KEY`: Your Gemini API key
      - `UNSPLASH_ACCESS_KEY`: Your Unsplash access key
      - `NODE_ENV`: `production`
