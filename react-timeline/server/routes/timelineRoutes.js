@@ -23,8 +23,6 @@ router.get('/api/timeline/searches', async (req, res) => {
 
 //Routes
 router.get('/search', async (req, res) => {
-  console.log('Search route called with query:', req.query);
-  
   const query = req.query.q;
   const startYearInput = req.query.startYear;
   const endYearInput = req.query.endYear;
@@ -43,16 +41,11 @@ router.get('/search', async (req, res) => {
     return res.status(400).json({ error: 'Query parameter "q" is required.' });
   }
 
-  console.log(`Processing search for: "${query}" (${startYear} - ${endYear})`);
-
   try {
     // Check for cached data
-    console.log('Checking cache for query:', query.toLowerCase());
     let cachedData = await TimelineModel.findOne({ query: query.toLowerCase() });
     
     if (cachedData) {
-      console.log(`Found "${query}" in DB cache.`);
-
       let filteredEvents = cachedData.timelineEvents;
       if (startYear !== null && endYear !== null) {
         filteredEvents = filterTimelineEventsByYear(filteredEvents, startYear, endYear);
@@ -66,18 +59,15 @@ router.get('/search', async (req, res) => {
       });
     }
 
-    console.log('No cache found, fetching from Wikipedia...');
+    // Fetch from Wikipedia
     const wikipediaUrl = `https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&titles=${encodeURIComponent(query)}&explaintext=1&redirects=1`;
-    console.log('Wikipedia URL:', wikipediaUrl);
-    
     const wikipediaResponse = await fetch(wikipediaUrl);
+    
     if (!wikipediaResponse.ok) {
-      throw new Error(`Wikipedia API failed: ${wikipediaResponse.status} ${wikipediaResponse.statusText}`);
+      throw new Error(`Wikipedia API failed: ${wikipediaResponse.status}`);
     }
     
     const wikipediaData = await wikipediaResponse.json();
-    console.log('Wikipedia response received');
-
     const pageId = Object.keys(wikipediaData.query.pages)[0];
     const page = wikipediaData.query.pages[pageId];
     let fullText = '';
@@ -87,34 +77,29 @@ router.get('/search', async (req, res) => {
     if (page.missing) {
       fullText = `No exact match found on Wikipedia for "${query}".`;
       images = [];
-      console.log('Wikipedia: term not found');
     } else {
       fullText = page.extract || `No extract available from Wikipedia for "${query}".`;
-      console.log(`Wikipedia text length: ${fullText.length} characters`);
       
-      console.log('Generating timeline with Gemini...');
+      // Generate timeline with Gemini
       try {
         timelineEvents = await generateTimelineFromGemini(fullText);
         timelineEvents = sortTimelineEvents(timelineEvents);
         timelineEvents = timelineEvents.filter(event => extractYear(event.date) !== null);
-        console.log(`Gemini generated ${timelineEvents.length} events.`);
       } catch (geminiError) {
-        console.error('Gemini API error:', geminiError.message);
+        console.error('Gemini error:', geminiError.message);
         timelineEvents = [];
       }
       
-      console.log('Fetching images from Unsplash...');
+      // Fetch images from Unsplash
       try {
         images = await fetchUnsplashImages(query);
-        console.log(`Found ${images.length} images`);
       } catch (unsplashError) {
-        console.error('Unsplash API error:', unsplashError.message);
+        console.error('Unsplash error:', unsplashError.message);
         images = [];
       }
     }
 
     // Save to database
-    console.log('Saving to database...');
     const newTimelineEntry = new TimelineModel({
       query: query.toLowerCase(),
       fullText,
@@ -122,15 +107,11 @@ router.get('/search', async (req, res) => {
       images,
     });
     await newTimelineEntry.save();
-    
-    console.log(`Saved "${query}" to DB.`);
 
     let filteredEvents = timelineEvents;
     if (startYear !== null && endYear !== null) {
       filteredEvents = filterTimelineEventsByYear(timelineEvents, startYear, endYear);
     }
-
-    console.log(`Returning ${filteredEvents.length} filtered events`);
 
     return res.json({
       extract: fullText,
@@ -140,9 +121,7 @@ router.get('/search', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error in /search:', error);
-    console.error('Error name:', error.name);
-    console.error('Error message:', error.message);
+    console.error('Search error:', error.message);
     
     if (error.name === 'MongooseServerSelectionError') {
       res.status(503).json({ error: 'Database connection failed. Please try again.' });
