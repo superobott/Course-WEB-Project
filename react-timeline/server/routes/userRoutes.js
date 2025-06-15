@@ -6,9 +6,16 @@ const LoggedInUser = require('../models/LoggedInUserModel');
 // Register new user
 router.post('/register', async (req, res) => {
   try {
+    console.log('Registration attempt for:', req.body.email);
     const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      console.log('User already exists:', email);
       return res.status(400).json({ message: 'User already exists' });
     }
 
@@ -19,10 +26,13 @@ router.post('/register', async (req, res) => {
     });
 
     await user.save();
+    console.log('User registered successfully:', email);
     res.status(201).json({ message: 'User registered successfully' });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Error registering user' });
+    console.error('Registration error details:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    res.status(500).json({ message: 'Error registering user', details: error.message });
   }
 });
 
@@ -68,18 +78,27 @@ router.put('/profile/:userId', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
+    console.log('Login attempt for:', req.body.email);
     const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Email and password are required' });
+    }
+
     const user = await User.findOne({ email });
     
     if (!user) {
+      console.log('User not found:', email);
       return res.status(401).json({ message: 'Invalid email or password' });
     }
     
     if (password !== user.password) {
+      console.log('Invalid password for user:', email);
       return res.status(401).json({ message: 'Invalid email or password' });
     }
 
     await LoggedInUser.create({ email });
+    console.log('User logged in successfully:', email);
 
     res.json({
       success: true,
@@ -87,8 +106,10 @@ router.post('/login', async (req, res) => {
       email: user.email
     });
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Error logging in' });
+    console.error('Login error details:', error);
+    console.error('Error name:', error.name);
+    console.error('Error message:', error.message);
+    res.status(500).json({ message: 'Error logging in', details: error.message });
   }
 });
 

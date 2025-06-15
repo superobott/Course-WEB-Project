@@ -22,16 +22,24 @@ app.use(express.text({ type: '*/*' }));
 
 // Connect to MongoDB Atlas
 const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://timeline_user:4r5t6y7u8I@timeline-cluster.xsx3fwr.mongodb.net/Timeline?retryWrites=true&w=majority&appName=timeline-cluster';
+console.log('Environment:', process.env.NODE_ENV);
+console.log('MongoDB URI configured:', mongoUri ? 'Yes' : 'No');
+console.log('Using fallback URI:', !process.env.MONGODB_URI);
+
 mongoose.connect(mongoUri)
   .then(() => {
     console.log('MongoDB connected successfully');
+    console.log('Connected to database:', mongoose.connection.name);
     // Debug: Check if we can access the searches collection
     mongoose.connection.db.collection('searches').countDocuments()
       .then(count => {
         console.log(`Number of documents in searches collection: ${count}`);
       });
   })
-  .catch(err => console.error('MongoDB connection error:', err));
+  .catch(err => {
+    console.error('MongoDB connection error:', err);
+    console.error('Connection string used:', mongoUri.replace(/:[^:]*@/, ':****@')); // Hide password in logs
+  });
 
 // Use routes
 const timelineRoutes = require('./routes/timelineRoutes');
@@ -47,6 +55,16 @@ app.get('/searches', async (req, res) => {
     console.error('Error fetching searches:', err);
     res.status(500).json({ message: 'Server error' });
   }
+});
+
+// Debug endpoint to check environment variables
+app.get('/debug', (req, res) => {
+  res.json({
+    nodeEnv: process.env.NODE_ENV,
+    mongoUriSet: !!process.env.MONGODB_URI,
+    mongoConnection: mongoose.connection.readyState,
+    connectionName: mongoose.connection.name
+  });
 });
 
 app.use('/api/users', userRoutes);
