@@ -7,6 +7,8 @@ const cors = require('cors');
 
 // Initialize express
 const app = express();
+const port = 4000;
+app.use(cors());
 
 // CORS configuration based on environment
 app.use(cors({
@@ -194,6 +196,11 @@ app.get('/searches', async (req, res) => {
   }
 });
 
+app.use('/api/users', userRoutes);
+app.use('/', timelineRoutes);
+app.use('/api', bubbleTimelineRoutes);
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
 // Use routes with database connection
 app.use('/api/users', async (req, res, next) => {
   try {
