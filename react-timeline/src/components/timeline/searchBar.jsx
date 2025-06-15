@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { API_BASE_URL } from '../../config/api';
 import '../../style/componentsStyle/searchBar.css';
 
 function SearchBar({ onSearch }) {
@@ -16,7 +17,7 @@ function SearchBar({ onSearch }) {
     }
 
     try {
-      const response = await fetch(`http://localhost:4000/api/users/search-history/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/api/users/search-history/${userId}`);
       if (response.ok) {
         const searchHistory = await response.json();
         const filteredSuggestions = searchHistory.filter(historyTerm => 

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Header from "../components/common/Header";
 import Footer from "../components/common/Footer";
+import { API_BASE_URL } from '../config/api';
 import "../style/pagestyle/TimelinePage.css";
 import { useNavigate } from 'react-router-dom';
 
@@ -31,7 +32,7 @@ const TimelinePage = () => {
 
     setLoading(true);
 
-    fetch(`http://localhost:4000/api/dataset?topic=${encodeURIComponent(storedTopic)}&type=${encodeURIComponent(storedType)}`)
+    fetch(`${API_BASE_URL}/api/dataset?topic=${encodeURIComponent(storedTopic)}&type=${encodeURIComponent(storedType)}`)
 
       .then((res) => {
         if (!res.ok) {
