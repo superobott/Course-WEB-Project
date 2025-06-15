@@ -26,11 +26,5 @@
   "env": {
     "NODE_ENV": "production",
     "MONGODB_TIMEOUT": "15000"
-  },
-  "functions": {
-    "server/server.js": {
-      "memory": 1024,
-      "maxDuration": 30
-    }
   }
 }
