@@ -151,30 +151,29 @@ app.get('/debug/collections', async (req, res) => {
     }
 
     const collections = await mongoose.connection.db.listCollections().toArray();
-    const collectionDetails = [];
-
-    for (const collection of collections) {
+    const collectionNames = collections.map(c => c.name);
+    
+    // Check if dataset collection exists and has data
+    let datasetInfo = { exists: false };
+    if (collectionNames.includes('dataset')) {
       try {
-        const count = await mongoose.connection.db.collection(collection.name).countDocuments();
-        const sample = await mongoose.connection.db.collection(collection.name).findOne();
-        
-        collectionDetails.push({
-          name: collection.name,
+        const count = await mongoose.connection.db.collection('dataset').countDocuments();
+        const sample = await mongoose.connection.db.collection('dataset').findOne();
+        datasetInfo = {
+          exists: true,
           count: count,
           sampleFields: sample ? Object.keys(sample) : []
-        });
+        };
       } catch (err) {
-        collectionDetails.push({
-          name: collection.name,
-          error: err.message
-        });
+        datasetInfo = { exists: true, error: err.message };
       }
     }
 
     res.json({
       database: mongoose.connection.name,
       totalCollections: collections.length,
-      collections: collectionDetails
+      collectionNames: collectionNames,
+      dataset: datasetInfo
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
