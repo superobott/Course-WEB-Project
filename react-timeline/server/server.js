@@ -68,19 +68,24 @@ async function connectToDatabase() {
     }
 
     // Connection options based on environment
+    const mongoTimeout = parseInt(process.env.MONGODB_TIMEOUT, 10) || 15000;
     const connectionOptions = {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      serverSelectionTimeoutMS: process.env.NODE_ENV === 'production' ? 10000 : 30000, // Longer timeout for local
-      socketTimeoutMS: 45000,
-      // Only include Atlas-specific options in production
+      serverSelectionTimeoutMS: mongoTimeout,
+      socketTimeoutMS: mongoTimeout * 2,
+      connectTimeoutMS: mongoTimeout,
+      // Production specific options
       ...(process.env.NODE_ENV === 'production' ? {
         authSource: 'admin',
         retryWrites: true,
-        w: 'majority'
+        w: 'majority',
+        maxPoolSize: 10,
+        minPoolSize: 1,
+        maxIdleTimeMS: mongoTimeout,
+        waitQueueTimeoutMS: mongoTimeout
       } : {
         // Local development specific options
-        connectTimeoutMS: 30000,
         heartbeatFrequencyMS: 1000
       })
     };
@@ -107,8 +112,14 @@ async function connectToDatabase() {
         console.error('MongoDB Connection Error:', errorInfo);
       }
 
-      // Reset cached connection on error
+    // Reset cached connection and attempt reconnect for non-fatal errors
+    if (!err.message.includes('bad auth')) {
+      console.log('Attempting to reconnect...');
       cachedDb = null;
+      setTimeout(() => connectToDatabase().catch(console.error), 5000);
+    } else {
+      cachedDb = null;
+    }
     });
 
     mongoose.connection.on('disconnected', () => {
@@ -245,8 +256,30 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Export the app for serverless use
-module.exports = app;
+// Cleanup on serverless environment shutdown
+process.on('SIGTERM', async () => {
+  console.log('SIGTERM received - Cleaning up...');
+  if (mongoose.connection.readyState === 1) {
+    await mongoose.connection.close();
+    console.log('MongoDB connection closed through app termination');
+  }
+  process.exit(0);
+});
+
+// Export handler for serverless use
+module.exports = async (req, res) => {
+  try {
+    await connectToDatabase();
+    return app(req, res);
+  } catch (error) {
+    console.error('Serverless function error:', error);
+    return res.status(500).json({
+      message: 'Server initialization error',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error',
+      details: error.name
+    });
+  }
+};
 
 // Only listen if not in serverless environment
 if (process.env.NODE_ENV !== 'production') {
